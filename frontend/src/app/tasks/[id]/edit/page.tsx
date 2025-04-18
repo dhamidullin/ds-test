@@ -6,6 +6,7 @@ import { useOptimistic, useActionState } from 'react'
 import { Task } from '@shared/types/task'
 import { tasksApi } from '@/lib/api'
 import { toast } from 'sonner'
+import { pick } from 'lodash'
 
 interface PageProps {
   params: Promise<{
@@ -46,7 +47,7 @@ export default function EditTaskPage({ params }: PageProps) {
         updateOptimisticTask(updatedTask)
 
         // Make the actual API call
-        const response = await tasksApi.update(Number(awaitedParams.id), updatedTask)
+        const response = await tasksApi.update(Number(awaitedParams.id), pick(updatedTask, ['title', 'description', 'completed']))
         setTask(response)
         toast.success('Changes saved successfully')
         return { error: null, success: true }
