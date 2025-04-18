@@ -1,4 +1,4 @@
-import { Task } from '@/../../shared/types/task'
+import { Task } from '@shared/types/task'
 import { tasksApi } from '@/lib/api'
 import { Metadata } from 'next'
 

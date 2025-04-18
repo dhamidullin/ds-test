@@ -29,7 +29,28 @@ export default function NewTaskPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">New Task</h1>
+      <div className="flex items-center gap-2 mb-6">
+        <button
+          onClick={() => router.push('/tasks')}
+          className="text-gray-600 hover:text-gray-900 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            />
+          </svg>
+        </button>
+        <h1 className="text-2xl font-bold">New Task</h1>
+      </div>
 
       <form onSubmit={handleSubmit} className="max-w-lg">
         <div className="mb-4">

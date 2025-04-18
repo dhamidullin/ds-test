@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Task, TaskCreationData, TaskUpdateData } from '@/../../shared/types/task'
+import { Task, TaskCreationData, TaskUpdateData } from '@shared/types/task'
 
 const getBaseUrl = () => {
   const isServer = typeof window === 'undefined'
