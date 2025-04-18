@@ -23,6 +23,23 @@ export default function TasksContent({ initialTasks }: TasksContentProps) {
     }
   }
 
+  // empty state
+  if (tasks.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg mb-4">No tasks yet</p>
+          <a
+            href="/tasks/new"
+            className="inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+          >
+            Create your first task
+          </a>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
