@@ -1,12 +1,13 @@
 {
   "private": true,
   "name": "frontend",
+  "version": "0.0.1",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "init-db": "npx ts-node --project tsconfig.scripts.json src/scripts/init-db.ts"
+    "test": "echo \"no tests yet\""
   },
   "dependencies": {
     "axios": "^1.8.4",

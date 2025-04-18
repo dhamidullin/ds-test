@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "test": "yarn workspace backend test && yarn workspace frontend test"
+  }
+}

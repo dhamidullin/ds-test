@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import TaskModel from '../models/Task';
-import { 
-  createTaskSchema, 
-  updateTaskSchema, 
+import {
+  createTaskSchema,
+  updateTaskSchema,
   taskIdSchema,
   CreateTaskInput,
   UpdateTaskInput
