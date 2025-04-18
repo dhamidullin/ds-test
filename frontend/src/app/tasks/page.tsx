@@ -1,16 +1,14 @@
-import { Task } from '@/lib/db';
+import { Task } from '@/../../shared/types/task'
+import { tasksApi } from '@/lib/api'
 
-async function getTasks() {
-  const tasks = await Task.findAll({
-    order: [['createdAt', 'DESC']],
-    raw: true // This returns plain objects instead of Sequelize instances
-  });
+async function getTasks(): Promise<Task[]> {
+  const response = await tasksApi.getAll()
 
-  return tasks;
+  return response
 }
 
 export default async function TasksPage() {
-  const tasks = await getTasks();
+  const tasks = await getTasks()
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -54,5 +52,5 @@ export default async function TasksPage() {
         ))}
       </div>
     </div>
-  );
+  )
 } 

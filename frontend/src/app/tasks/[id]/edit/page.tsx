@@ -1,80 +1,60 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-interface Task {
-  id: number;
-  title: string;
-  description: string | null;
-  completed: boolean;
-}
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Task } from '@/../../shared/types/task'
+import { tasksApi } from '@/lib/api'
 
 export default function EditTaskPage({ params }: { params: { id: string } }) {
-  const router = useRouter();
-  const [task, setTask] = useState<Task | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter()
+  const [task, setTask] = useState<Task | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     async function fetchTask() {
       try {
-        const response = await fetch(`/api/tasks/${params.id}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch task');
-        }
-        const data = await response.json();
-        setTask(data);
+        const response = await tasksApi.getById(Number(params.id))
+        setTask(response)
       } catch (error) {
-        console.error('Error fetching task:', error);
-        alert('Failed to load task');
+        console.error('Error fetching task:', error)
+        alert('Failed to load task')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     }
 
-    fetchTask();
-  }, [params.id]);
+    fetchTask()
+  }, [params.id])
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!task) return;
+    e.preventDefault()
+    if (!task) return
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
-      const response = await fetch(`/api/tasks/${params.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: task.title,
-          description: task.description,
-          completed: task.completed,
-        }),
-      });
+      const updatedTask = await tasksApi.update(Number(params.id), {
+        title: task.title,
+        description: task.description,
+        completed: task.completed,
+      })
 
-      if (!response.ok) {
-        throw new Error('Failed to update task');
-      }
-
-      router.push('/tasks');
-      router.refresh();
+      setTask(updatedTask)
     } catch (error) {
-      console.error('Error updating task:', error);
-      alert('Failed to update task');
+      console.error('Error updating task:', error)
+      alert('Failed to update task')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
   if (isLoading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>;
+    return <div className="container mx-auto px-4 py-8">Loading...</div>
   }
 
   if (!task) {
-    return <div className="container mx-auto px-4 py-8">Task not found</div>;
+    return <div className="container mx-auto px-4 py-8">Task not found</div>
   }
 
   return (
@@ -140,5 +120,5 @@ export default function EditTaskPage({ params }: { params: { id: string } }) {
         </div>
       </form>
     </div>
-  );
+  )
 } 

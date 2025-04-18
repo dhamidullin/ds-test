@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { tasksApi } from '@/lib/api';
 
 export default function NewTaskPage() {
   const router = useRouter();
@@ -14,19 +15,9 @@ export default function NewTaskPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title, description }),
-      });
+      const newTask = await tasksApi.create({ title, description });
 
-      if (!response.ok) {
-        throw new Error('Failed to create task');
-      }
-
-      router.push('/tasks');
+      router.push(`/tasks/${newTask.id}/edit`);
       router.refresh();
     } catch (error) {
       console.error('Error creating task:', error);
@@ -39,7 +30,7 @@ export default function NewTaskPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">New Task</h1>
-      
+
       <form onSubmit={handleSubmit} className="max-w-lg">
         <div className="mb-4">
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
