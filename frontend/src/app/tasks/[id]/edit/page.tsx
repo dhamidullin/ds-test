@@ -52,7 +52,6 @@ export default function EditTaskPage({ params }: PageProps) {
         toast.success('Changes saved successfully')
         return { error: null, success: true }
       } catch (error) {
-        console.error('Error updating task:', error)
         toast.error('Failed to save changes')
         return { ...currentState, error: 'Failed to update task' }
       }

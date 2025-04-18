@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { showDeleteConfirmationToast } from '../../../app/tasks/DeleteConfirmationToast'
+import { showDeleteConfirmationToast } from '../../../../app/tasks/DeleteConfirmationToast'
 import { toast } from 'sonner'
 
 // Mock the sonner toast

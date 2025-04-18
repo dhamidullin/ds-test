@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { EditButton } from '../../../components/ui/EditButton'
+import { EditButton } from '../../../../components/ui/EditButton'
 
 describe('EditButton', () => {
   it('renders edit button with correct styles', () => {

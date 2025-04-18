@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { DeleteButton } from '../../../components/ui/DeleteButton'
+import { DeleteButton } from '../../../../components/ui/DeleteButton'
 
 describe('DeleteButton', () => {
   it('renders delete button with correct styles', () => {
