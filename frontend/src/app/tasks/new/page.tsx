@@ -1,29 +1,29 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { tasksApi } from '@/lib/api';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { tasksApi } from '@/lib/api'
 
 export default function NewTaskPage() {
-  const router = useRouter();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter()
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsSubmitting(true);
+    e.preventDefault()
+    setIsSubmitting(true)
 
     try {
-      const newTask = await tasksApi.create({ title, description });
+      const newTask = await tasksApi.create({ title, description })
 
-      router.push(`/tasks/${newTask.id}/edit`);
-      router.refresh();
+      router.push(`/tasks/${newTask.id}/edit`)
+      router.refresh()
     } catch (error) {
-      console.error('Error creating task:', error);
-      alert('Failed to create task');
+      console.error('Error creating task:', error)
+      alert('Failed to create task')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
@@ -77,5 +77,5 @@ export default function NewTaskPage() {
         </div>
       </form>
     </div>
-  );
+  )
 } 

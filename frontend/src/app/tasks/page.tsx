@@ -1,5 +1,11 @@
 import { Task } from '@/../../shared/types/task'
 import { tasksApi } from '@/lib/api'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Tasks',
+  description: '',
+};
 
 async function getTasks(): Promise<Task[]> {
   const response = await tasksApi.getAll()
