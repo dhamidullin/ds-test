@@ -5,7 +5,13 @@ import { useRouter } from 'next/navigation'
 import { Task } from '@shared/types/task'
 import { tasksApi } from '@/lib/api'
 
-export default function EditTaskPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: Promise<{
+    id: string
+  }>
+}
+
+export default function EditTaskPage({ params }: PageProps) {
   const router = useRouter()
   const [task, setTask] = useState<Task | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -14,7 +20,8 @@ export default function EditTaskPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     async function fetchTask() {
       try {
-        const response = await tasksApi.getById(Number(params.id))
+        const awaitedParams = await params
+        const response = await tasksApi.getById(Number(awaitedParams.id))
         setTask(response)
       } catch (error) {
         console.error('Error fetching task:', error)
@@ -25,7 +32,7 @@ export default function EditTaskPage({ params }: { params: { id: string } }) {
     }
 
     fetchTask()
-  }, [params.id])
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -34,7 +41,8 @@ export default function EditTaskPage({ params }: { params: { id: string } }) {
     setIsSubmitting(true)
 
     try {
-      const updatedTask = await tasksApi.update(Number(params.id), {
+      const awaitedParams = await params
+      const updatedTask = await tasksApi.update(Number(awaitedParams.id), {
         title: task.title,
         description: task.description,
         completed: task.completed,

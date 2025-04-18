@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import apiRouter from './routes'
+import { initializeDatabase } from './scripts/db-sync'
 
 const app = express()
 const PORT = 3001
@@ -23,4 +24,6 @@ app.use('/api', apiRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
+
+  initializeDatabase()
 })

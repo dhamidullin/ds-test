@@ -1,9 +1,16 @@
+import Task from '../models/Task'
 import sequelize from '../config/database'
 
-async function initializeDatabase() {
+export async function initializeDatabase() {
   try {
     await sequelize.authenticate()
     console.log('Database connection has been established successfully.')
+
+    // Explicitly register the model
+    const models = [Task]
+    models.forEach(model => {
+      sequelize.define(model.tableName, model.getAttributes())
+    })
 
     await sequelize.sync({ alter: true })
     console.log('Database models synchronized.')
@@ -12,16 +19,3 @@ async function initializeDatabase() {
     throw error
   }
 }
-
-async function main() {
-  try {
-    await initializeDatabase()
-    console.log('Database initialized successfully')
-    process.exit(0)
-  } catch (error) {
-    console.error('Failed to initialize database:', error)
-    process.exit(1)
-  }
-}
-
-main()
