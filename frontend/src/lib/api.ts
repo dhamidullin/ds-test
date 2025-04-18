@@ -2,17 +2,12 @@ import axios from 'axios'
 import { Task, TaskCreationData, TaskUpdateData } from '@shared/types/task'
 
 const getBaseUrl = () => {
-  const isProduction = process.env.NODE_ENV === 'production'
-  const isServer = typeof window === 'undefined'
+  if (process.env.NODE_ENV === 'development')
+    return 'http://localhost:3001/api' // expected location of the backend dev server
 
-  if (isServer) {
-    // Server-side requests
-    return isProduction
-      ? 'http://backend:3001/api' // the docker container name
-      : 'http://localhost:3001/api' // exopected locations of the backend dev server
-  }
-
-  return '/api'
+  return typeof window === 'undefined' // is server
+    ? 'http://backend:3001/api' // backend docker compose service address
+    : '/api' // nginx will redirect all incoming /api requests to the backend docker compose service
 }
 
 const api = axios.create({
