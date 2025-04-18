@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useOptimistic, useActionState } from 'react'
 import { Task } from '@shared/types/task'
 import { tasksApi } from '@/lib/api'
+import { toast } from 'sonner'
 
 interface PageProps {
   params: Promise<{
@@ -47,9 +48,11 @@ export default function EditTaskPage({ params }: PageProps) {
         // Make the actual API call
         const response = await tasksApi.update(Number(awaitedParams.id), updatedTask)
         setTask(response)
+        toast.success('Changes saved successfully')
         return { error: null, success: true }
       } catch (error) {
         console.error('Error updating task:', error)
+        toast.error('Failed to save changes')
         return { ...currentState, error: 'Failed to update task' }
       }
     },
@@ -65,6 +68,7 @@ export default function EditTaskPage({ params }: PageProps) {
       } catch (error) {
         console.error('Error fetching task:', error)
         state.error = 'Failed to load task'
+        toast.error('Failed to load task')
       } finally {
         setIsLoading(false)
       }
