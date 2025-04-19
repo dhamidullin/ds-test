@@ -44,12 +44,12 @@ describe('EditTaskPage', () => {
       ; (tasksApi.getById as jest.Mock).mockResolvedValue(mockTask)
   })
 
-  it('renders the edit task form with initial values', async () => {
+  it('renders the save changes form with initial values', async () => {
     render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
 
     // Wait for the task to load
     await waitFor(() => {
-      expect(screen.getByText('Edit Task')).toBeInTheDocument()
+      expect(screen.getByText('Save Changes')).toBeInTheDocument()
     })
 
     expect(screen.getByLabelText('Title')).toHaveValue('Original Title')

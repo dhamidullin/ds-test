@@ -44,3 +44,9 @@ Nginx will redirect all /api requests to the backend and the rest to the fronten
    The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:3001`.
 
    > **Note:** Make sure the PostgreSQL database container is running (`docker-compose up -d postgres`) before starting the development servers or use a different database url. 
+
+## TODO
+
+- Properly handle NEXT_PUBLIC_API_URL environment variable
+- Find better way to sync database on backend
+- Add dockerised development environment 

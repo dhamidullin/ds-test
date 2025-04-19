@@ -18,7 +18,6 @@ router.get('/', async (_req, res) => {
 
     res.json(tasks);
   } catch (error) {
-    console.error('Error fetching tasks:', error);
     res.status(500).json({ error: 'Failed to fetch tasks' });
   }
 });
