@@ -34,6 +34,12 @@ const EditTaskPage: FC<PageProps> = ({ params }) => {
     () => tasksApi.getById(Number(taskId)),
     {
       onError: (error) => {
+        if (error?.response?.status === 404) {
+          toast.error('This task does not exist')
+          router.push('/tasks')
+          return
+        }
+
         console.error('Error fetching task:', error)
         toast.error('Failed to load task')
       },
@@ -61,7 +67,7 @@ const EditTaskPage: FC<PageProps> = ({ params }) => {
 
         // Make the actual API call
         const update = pick(updatedTask, ['title', 'description', 'completed'])
-        const response = await tasksApi.update(Number(taskId), update)
+        await tasksApi.update(Number(taskId), update)
 
         toast.success('Changes saved successfully')
         return { error: null, success: true }
@@ -119,6 +125,7 @@ const EditTaskPage: FC<PageProps> = ({ params }) => {
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
             Title
           </label>
+
           <input
             type="text"
             id="title"
@@ -133,6 +140,7 @@ const EditTaskPage: FC<PageProps> = ({ params }) => {
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
             Description
           </label>
+
           <textarea
             id="description"
             name="description"
@@ -150,7 +158,10 @@ const EditTaskPage: FC<PageProps> = ({ params }) => {
               defaultChecked={task.completed}
               className="mr-2"
             />
-            <span className="text-sm font-medium text-gray-700">Completed</span>
+
+            <span className="text-sm font-medium text-gray-700">
+              Completed
+            </span>
           </label>
         </div>
 
