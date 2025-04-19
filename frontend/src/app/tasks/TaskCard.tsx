@@ -1,6 +1,6 @@
 import { Task } from '@shared/types/task'
-import { DeleteButton } from '@/components/ui/DeleteButton'
-import { EditButton } from '@/components/ui/EditButton'
+import ClickButton from '@/components/ui/ClickButton'
+import LinkButton from '@/components/ui/LinkButton'
 
 interface TaskCardProps {
   task: Task
@@ -29,8 +29,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete }) => {
             {task.completed ? 'Completed' : 'Pending'}
           </span>
           <div className="flex items-center gap-2">
-            <EditButton href={`/tasks/${task.id}/edit`} />
-            <DeleteButton onClick={() => onDelete(task.id)} />
+            <LinkButton href={`/tasks/${task.id}/edit`} />
+            <ClickButton onClick={() => onDelete(task.id)} />
           </div>
         </div>
       </div>

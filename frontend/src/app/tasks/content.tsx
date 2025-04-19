@@ -2,17 +2,18 @@
 
 import { Task } from '@shared/types/task'
 import { tasksApi } from '@/lib/api'
-import { useState } from 'react'
+import { FC, useState } from 'react'
 import { TaskCard } from './TaskCard'
 import { EmptyState } from './EmptyState'
 import { NewTaskButton } from './NewTaskButton'
-import { showDeleteConfirmationToast } from './DeleteConfirmationToast'
+import DeleteConfirmationToast from './DeleteConfirmationToast'
+import { toast } from 'sonner'
 
 interface TasksContentProps {
   initialTasks: Task[]
 }
 
-export default function TasksContent({ initialTasks }: TasksContentProps) {
+const TasksContent: FC<TasksContentProps> = ({ initialTasks }) => {
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
 
   const handleDelete = async (taskId: number) => {
@@ -26,7 +27,19 @@ export default function TasksContent({ initialTasks }: TasksContentProps) {
       }
     }
 
-    showDeleteConfirmationToast({ onConfirm: deleteTask })
+    toast.custom((t) => (
+      <DeleteConfirmationToast
+        onConfirm={() => {
+          toast.dismiss(t)
+          toast.promise(deleteTask(), {
+            loading: 'Deleting task...',
+            success: 'Task deleted successfully',
+            error: 'Failed to delete task',
+          })
+        }}
+        onCancel={() => toast.dismiss(t)}
+      />
+    ))
   }
 
   // empty state
@@ -49,3 +62,5 @@ export default function TasksContent({ initialTasks }: TasksContentProps) {
     </div>
   )
 }
+
+export default TasksContent

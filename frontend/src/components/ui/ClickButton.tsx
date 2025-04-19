@@ -1,14 +1,15 @@
 import { FC } from 'react'
 
-interface DeleteButtonProps {
+interface DeleteButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   onClick: () => void
 }
 
-export const DeleteButton: FC<DeleteButtonProps> = ({ onClick }) => {
+const DeleteButton: FC<DeleteButtonProps> = ({ onClick, ...rest }) => {
   return (
     <button
       onClick={onClick}
       className="p-2 text-gray-500 hover:text-red-500 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+      {...rest}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -26,4 +27,6 @@ export const DeleteButton: FC<DeleteButtonProps> = ({ onClick }) => {
       </svg>
     </button>
   )
-} 
+}
+
+export default DeleteButton

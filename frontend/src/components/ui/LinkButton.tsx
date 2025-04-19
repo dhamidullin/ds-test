@@ -1,14 +1,15 @@
 import { FC } from 'react'
 
-interface EditButtonProps {
+interface EditButtonProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   href: string
 }
 
-export const EditButton: FC<EditButtonProps> = ({ href }) => {
+const EditButton: FC<EditButtonProps> = ({ href, ...rest }) => {
   return (
     <a
       href={href}
       className="p-2 text-gray-500 hover:text-blue-500 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+      {...rest}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -26,4 +27,6 @@ export const EditButton: FC<EditButtonProps> = ({ href }) => {
       </svg>
     </a>
   )
-} 
+}
+
+export default EditButton

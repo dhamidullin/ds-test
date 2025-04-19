@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, FC } from 'react'
 import { useRouter } from 'next/navigation'
 import { useActionState } from 'react'
-import { Task } from '@shared/types/task'
 import { tasksApi } from '@/lib/api'
 import { toast } from 'sonner'
 import { pick } from 'lodash'
 import useSWR from 'swr'
-import { SaveButton } from '@/components/ui/SaveButton'
+import { RippleButton } from '@/components/ui/RippleButton'
 
 interface PageProps {
   params: Promise<{
@@ -21,9 +20,8 @@ interface ActionState {
   success: boolean
 }
 
-export default function EditTaskPage({ params }: PageProps) {
+const EditTaskPage: FC<PageProps> = ({ params }) => {
   const router = useRouter()
-  const [rippleStyle, setRippleStyle] = useState<{ left: number; top: number } | null>(null)
   const [taskId, setTaskId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -74,18 +72,6 @@ export default function EditTaskPage({ params }: PageProps) {
     },
     { error: null, success: false }
   )
-
-  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const button = e.currentTarget
-    const rect = button.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
-    setRippleStyle({ left: x, top: y })
-
-    // Remove ripple after animation
-    setTimeout(() => setRippleStyle(null), 600)
-  }
 
   if (!taskId || isLoading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>
@@ -169,19 +155,11 @@ export default function EditTaskPage({ params }: PageProps) {
         </div>
 
         <div className="flex gap-2">
-          <SaveButton isPending={isPending} onClick={handleButtonClick} />
+          <RippleButton isPending={isPending} type="submit" />
         </div>
       </form>
-
-      <style jsx global>{`
-        @keyframes ripple {
-          to {
-            width: 200%;
-            height: 200%;
-            opacity: 0;
-          }
-        }
-      `}</style>
     </div>
   )
-} 
+}
+
+export default EditTaskPage

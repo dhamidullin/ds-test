@@ -1,69 +1,62 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { showDeleteConfirmationToast } from '../../../../app/tasks/DeleteConfirmationToast'
-import { toast } from 'sonner'
-
-// Mock the sonner toast
-jest.mock('sonner', () => ({
-  toast: {
-    custom: jest.fn(),
-    dismiss: jest.fn(),
-    promise: jest.fn(),
-  },
-}))
+import DeleteConfirmationToast from '../../../../app/tasks/DeleteConfirmationToast'
 
 describe('DeleteConfirmationToast', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('shows confirmation toast with correct content', () => {
     const mockOnConfirm = jest.fn()
-    showDeleteConfirmationToast({ onConfirm: mockOnConfirm })
-
-    // Get the custom toast function call
-    const customToastCall = (toast.custom as jest.Mock).mock.calls[0][0]
-    const { getByText } = render(customToastCall({}))
+    const mockOnCancel = jest.fn()
+    
+    render(
+      <DeleteConfirmationToast 
+        onConfirm={mockOnConfirm} 
+        onCancel={mockOnCancel} 
+      />
+    )
 
     // Check toast content
-    expect(getByText('Delete Task')).toBeInTheDocument()
-    expect(getByText('Are you sure you want to delete this task?')).toBeInTheDocument()
-    expect(getByText('Cancel')).toBeInTheDocument()
-    expect(getByText('Delete')).toBeInTheDocument()
+    expect(screen.getByText('Delete Task')).toBeInTheDocument()
+    expect(screen.getByText('Are you sure you want to delete this task?')).toBeInTheDocument()
+    expect(screen.getByText('Cancel')).toBeInTheDocument()
+    expect(screen.getByText('Delete')).toBeInTheDocument()
   })
 
   it('calls onConfirm when delete button is clicked', () => {
     const mockOnConfirm = jest.fn()
-    showDeleteConfirmationToast({ onConfirm: mockOnConfirm })
-
-    const customToastCall = (toast.custom as jest.Mock).mock.calls[0][0]
-    const { getByText } = render(customToastCall({}))
+    const mockOnCancel = jest.fn()
+    
+    render(
+      <DeleteConfirmationToast 
+        onConfirm={mockOnConfirm} 
+        onCancel={mockOnCancel} 
+      />
+    )
 
     // Click delete button
-    fireEvent.click(getByText('Delete'))
+    fireEvent.click(screen.getByText('Delete'))
 
-    // Verify toast.dismiss was called
-    expect(toast.dismiss).toHaveBeenCalled()
-    // Verify toast.promise was called with onConfirm
-    expect(toast.promise).toHaveBeenCalledWith(mockOnConfirm(), {
-      loading: 'Deleting task...',
-      success: 'Task deleted successfully',
-      error: 'Failed to delete task',
-    })
+    // Verify onConfirm was called
+    expect(mockOnConfirm).toHaveBeenCalled()
+    // Verify onCancel was not called
+    expect(mockOnCancel).not.toHaveBeenCalled()
   })
 
-  it('dismisses toast when cancel button is clicked', () => {
+  it('calls onCancel when cancel button is clicked', () => {
     const mockOnConfirm = jest.fn()
-    showDeleteConfirmationToast({ onConfirm: mockOnConfirm })
-
-    const customToastCall = (toast.custom as jest.Mock).mock.calls[0][0]
-    const { getByText } = render(customToastCall({}))
+    const mockOnCancel = jest.fn()
+    
+    render(
+      <DeleteConfirmationToast 
+        onConfirm={mockOnConfirm} 
+        onCancel={mockOnCancel} 
+      />
+    )
 
     // Click cancel button
-    fireEvent.click(getByText('Cancel'))
+    fireEvent.click(screen.getByText('Cancel'))
 
-    // Verify toast.dismiss was called
-    expect(toast.dismiss).toHaveBeenCalled()
+    // Verify onCancel was called
+    expect(mockOnCancel).toHaveBeenCalled()
     // Verify onConfirm was not called
     expect(mockOnConfirm).not.toHaveBeenCalled()
   })
