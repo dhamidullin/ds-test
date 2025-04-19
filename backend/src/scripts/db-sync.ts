@@ -1,7 +1,7 @@
 import Task from '../models/Task'
 import sequelize from '../config/database'
 
-export async function initializeDatabase() {
+async function initializeDatabase() {
   try {
     await sequelize.authenticate()
     console.log('Database connection has been established successfully.')
@@ -14,8 +14,11 @@ export async function initializeDatabase() {
 
     await sequelize.sync({ alter: true })
     console.log('Database models synchronized.')
+    process.exit(0)
   } catch (error) {
     console.error('Unable to connect to the database:', error)
-    throw error
+    process.exit(1)
   }
 }
+
+initializeDatabase()

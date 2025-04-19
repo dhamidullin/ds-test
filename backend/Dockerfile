@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 3001
 
 # Start the app with ts-node
-CMD ["yarn", "start"] 
+# CMD ["yarn", "start"] # handled by docker-compose

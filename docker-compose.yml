@@ -18,7 +18,7 @@ services:
     depends_on:
       - backend
 
-  backend:
+  backend: &backend-base
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -26,6 +26,11 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/digital_suits
     depends_on:
       - db
+    command: [ "yarn", "start" ]
+
+  db-sync:
+    <<: *backend-base
+    command: [ "yarn", "db:sync" ]
 
   db:
     image: postgres:15-alpine

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "ts-node --transpile-only src/index.ts",
+    "db:sync": "ts-node src/scripts/db-sync.ts",
     "test": "jest"
   },
   "dependencies": {

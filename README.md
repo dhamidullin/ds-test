@@ -12,6 +12,7 @@ This will start:
 - Nginx reverse proxy at `http://localhost:5643`
 - Frontend (accessible through Nginx)
 - Backend API (accessible through Nginx)
+- Database synchronization service (runs once to sync schema)
 - PostgreSQL database (exposed at port 5432 so it can be used by dev server too)
 - pgAdmin for database management at `http://localhost:5050` (use pg address to connect)
 
@@ -26,6 +27,11 @@ This command will:
 - Replace running containers with new ones
 - Keep the application running during the update
 - Run everything in detached mode (-d flag)
+
+To manually re-sync the database schema:
+```bash
+docker-compose up db-sync
+```
 
 ## Local Development Setup
 
@@ -69,8 +75,7 @@ This will:
 - Keep the application running during the process
 - Run everything in detached mode (-d flag)
 
-## TODO
-
-- Properly handle NEXT_PUBLIC_API_URL environment variable
-- Find better way to sync database on backend
-- Add dockerised development environment 
+To remove ALL including volumes (database data):
+```bash
+docker-compose down -v
+```
