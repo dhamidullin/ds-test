@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { TaskController } from '../controllers/taskController';
 import container from '../container';
 import { types } from '../types';
+import type { TaskController } from '../controllers/taskController';
 
 const router = Router();
 const taskController = container.get<TaskController>(types.TaskController);

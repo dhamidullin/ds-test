@@ -24,15 +24,21 @@ describe('Tasks Router Integration Tests', () => {
   describe('GET /tasks', () => {
     it('should return all tasks', async () => {
       const mockTasks = [
-        { id: 1, title: 'Task 1', completed: false },
-        { id: 2, title: 'Task 2', completed: true }
+        { id: 1, title: 'Task 1', description: 'Desc 1', completed: false, createdAt: new Date(), updatedAt: new Date() },
+        { id: 2, title: 'Task 2', description: 'Desc 2', completed: true, createdAt: new Date(), updatedAt: new Date() }
       ];
+      const tasksExpectedToReturn = mockTasks.map(task => ({
+        ...task,
+        createdAt: task.createdAt.toISOString(),
+        updatedAt: task.updatedAt.toISOString()
+      }));
+
       (TaskModel.findAll as jest.Mock).mockResolvedValue(mockTasks);
 
       const response = await request(app).get('/tasks');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockTasks);
+      expect(response.body).toEqual(tasksExpectedToReturn);
       expect(TaskModel.findAll).toHaveBeenCalled();
     });
 
@@ -49,7 +55,12 @@ describe('Tasks Router Integration Tests', () => {
   describe('POST /tasks', () => {
     it('should create a new task', async () => {
       const newTask = { title: 'New Task', description: 'Description' };
-      const createdTask = { id: 1, ...newTask, completed: false };
+      const createdTask = { id: 1, ...newTask, completed: false, createdAt: new Date(), updatedAt: new Date() };
+      const taskExpectedToReturn = {
+        ...createdTask,
+        createdAt: createdTask.createdAt.toISOString(),
+        updatedAt: createdTask.updatedAt.toISOString()
+      };
       (TaskModel.create as jest.Mock).mockResolvedValue(createdTask);
 
       const response = await request(app)
@@ -57,7 +68,7 @@ describe('Tasks Router Integration Tests', () => {
         .send(newTask);
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(createdTask);
+      expect(response.body).toEqual(taskExpectedToReturn);
       expect(TaskModel.create).toHaveBeenCalledWith({
         ...newTask,
         completed: false
@@ -79,13 +90,18 @@ describe('Tasks Router Integration Tests', () => {
 
   describe('GET /tasks/:id', () => {
     it('should return a specific task', async () => {
-      const mockTask = { id: 1, title: 'Task 1', completed: false };
+      const mockTask = { id: 1, title: 'Task 1', description: 'Desc 1', completed: false, createdAt: new Date(), updatedAt: new Date() };
+      const taskExpectedToReturn = {
+        ...mockTask,
+        createdAt: mockTask.createdAt.toISOString(),
+        updatedAt: mockTask.updatedAt.toISOString()
+      };
       (TaskModel.findByPk as jest.Mock).mockResolvedValue(mockTask);
 
       const response = await request(app).get('/tasks/1');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockTask);
+      expect(response.body).toEqual(taskExpectedToReturn);
       expect(TaskModel.findByPk).toHaveBeenCalledWith(1);
     });
 
@@ -101,11 +117,13 @@ describe('Tasks Router Integration Tests', () => {
 
   describe('PUT /tasks/:id', () => {
     it('should update a task', async () => {
-      const existingTask = { id: 1, title: 'Old Title', completed: false };
-      const updateData = { title: 'New Title' };
-      const updatedTask = {
-        ...existingTask,
-        ...updateData
+      const existingTask = { id: 1, title: 'Old Title', description: 'Old Desc', completed: false, createdAt: new Date(), updatedAt: new Date() };
+      const updateData = { title: 'New Title', description: 'New Desc' };
+      const updatedTask = { ...existingTask, ...updateData, updatedAt: new Date() };
+      const taskExpectedToReturn = {
+        ...updatedTask,
+        createdAt: updatedTask.createdAt.toISOString(),
+        updatedAt: updatedTask.updatedAt.toISOString()
       };
 
       const update = jest.fn().mockImplementation(async (data) => {
@@ -124,7 +142,7 @@ describe('Tasks Router Integration Tests', () => {
         .send(updateData);
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(updatedTask);
+      expect(response.body).toEqual(taskExpectedToReturn);
       expect(update).toHaveBeenCalledWith(updateData);
     });
 
@@ -143,7 +161,7 @@ describe('Tasks Router Integration Tests', () => {
 
   describe('DELETE /tasks/:id', () => {
     it('should delete a task', async () => {
-      const mockTask = { id: 1, title: 'Task 1', completed: false };
+      const mockTask = { id: 1, title: 'Task 1', description: 'Desc 1', completed: false, createdAt: new Date(), updatedAt: new Date() };
 
       const destroy = jest.fn().mockResolvedValue(1);
 

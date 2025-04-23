@@ -8,10 +8,7 @@ import type { TaskRepository } from '../repositories/taskRepository';
 export class TaskService {
   constructor(
     @inject(types.TaskRepository) private readonly taskRepository: TaskRepository
-  ) {
-    console.log('TaskService constructor');
-    console.log(this.taskRepository);
-  }
+  ) { }
 
   async getAllTasks(): Promise<Task[]> {
     return this.taskRepository.listAllTasks();
