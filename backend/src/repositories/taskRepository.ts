@@ -5,8 +5,6 @@ import { Task } from '@shared/types/task';
 
 @injectable()
 export class TaskRepository {
-  static readonly TYPE = Symbol.for('TaskRepository');
-
   private convertTaskToDTO(task: TaskModel): Task {
     return {
       id: task.id,

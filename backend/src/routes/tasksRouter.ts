@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { TaskController } from '../controllers/taskController';
 import container from '../container';
+import { types } from '../types';
 
 const router = Router();
-const taskController = container.get<TaskController>(TaskController.TYPE);
+const taskController = container.get<TaskController>(types.TaskController);
 
 router.get('/', taskController.getAllTasks.bind(taskController));
 router.post('/', taskController.createTask.bind(taskController));

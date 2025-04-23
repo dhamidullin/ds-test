@@ -4,7 +4,7 @@ import tasksRouter from '../../../routes/tasksRouter';
 import TaskModel from '../../../models/TaskModel';
 
 // Mock the Task model
-jest.mock('../../../models/Task', () => ({
+jest.mock('../../../models/TaskModel', () => ({
   findAll: jest.fn(),
   create: jest.fn(),
   findByPk: jest.fn(),

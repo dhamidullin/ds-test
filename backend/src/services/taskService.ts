@@ -1,15 +1,17 @@
 import { injectable, inject } from 'inversify';
 import { Task } from '@shared/types/task';
 import { CreateTaskInput, UpdateTaskInput } from '../validators/task';
-import { TaskRepository } from '../repositories/taskRepository';
+import { types } from '../types';
+import type { TaskRepository } from '../repositories/taskRepository';
 
 @injectable()
 export class TaskService {
-  static readonly TYPE = Symbol.for('TaskService');
-
   constructor(
-    @inject(TaskRepository.TYPE) private readonly taskRepository: TaskRepository
-  ) {}
+    @inject(types.TaskRepository) private readonly taskRepository: TaskRepository
+  ) {
+    console.log('TaskService constructor');
+    console.log(this.taskRepository);
+  }
 
   async getAllTasks(): Promise<Task[]> {
     return this.taskRepository.listAllTasks();

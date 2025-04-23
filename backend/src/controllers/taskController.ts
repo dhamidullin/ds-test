@@ -1,15 +1,14 @@
 import { injectable, inject } from 'inversify';
 import { Request, Response } from 'express';
 import { CreateTaskInput, UpdateTaskInput, createTaskSchema, updateTaskSchema, taskIdSchema } from '../validators/task';
-import { TaskService } from '../services/taskService';
+import type { TaskService } from '../services/taskService';
+import { types } from '../types';
 
 @injectable()
 export class TaskController {
-  static readonly TYPE = Symbol.for('TaskController');
-
   constructor(
-    @inject(TaskService.TYPE) private readonly taskService: TaskService
-  ) {}
+    @inject(types.TaskService) private readonly taskService: TaskService
+  ) { }
 
   async getAllTasks(_req: Request, res: Response): Promise<void> {
     try {
@@ -57,10 +56,12 @@ export class TaskController {
       const { id } = taskIdSchema.parse({ id: req.params.id });
       const validatedData = updateTaskSchema.parse(req.body);
       const task = await this.taskService.updateTask(id, validatedData);
+
       if (!task) {
         res.status(404).json({ error: 'Task not found' });
         return;
       }
+
       res.json(task);
     } catch (error) {
       if (error instanceof Error) {

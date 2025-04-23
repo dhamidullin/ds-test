@@ -7,16 +7,17 @@ import { Container } from 'inversify';
 import { TaskRepository } from './repositories/taskRepository';
 import { TaskService } from './services/taskService';
 import { TaskController } from './controllers/taskController';
+import { types } from './types';
 
 const container = new Container();
 
 // repositories
-container.bind<TaskRepository>(TaskRepository.TYPE).to(TaskRepository).inSingletonScope();
+container.bind<TaskRepository>(types.TaskRepository).to(TaskRepository).inSingletonScope();
 
 // services
-container.bind<TaskService>(TaskService.TYPE).to(TaskService).inSingletonScope();
+container.bind<TaskService>(types.TaskService).to(TaskService).inSingletonScope();
 
 // controllers
-container.bind<TaskController>(TaskController.TYPE).to(TaskController).inSingletonScope();
+container.bind<TaskController>(types.TaskController).to(TaskController).inSingletonScope();
 
 export default container;
