@@ -1,7 +1,7 @@
 import request from 'supertest';
 import express from 'express';
-import tasksRouter from '../../../routes/tasks';
-import TaskModel from '../../../models/Task';
+import tasksRouter from '../../../routes/tasksRouter';
+import TaskModel from '../../../models/TaskModel';
 
 // Mock the Task model
 jest.mock('../../../models/Task', () => ({

@@ -10,8 +10,12 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["../shared/*"]
-    }
+      "@shared/*": [
+        "../shared/*"
+      ]
+    },
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
     "src"

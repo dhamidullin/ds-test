@@ -1,16 +1,16 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from './index';
 
-class Task extends Model {
+class TaskModel extends Model {
   public id!: number;
   public title!: string;
-  public description?: string;
+  public description!: string;
   public completed!: boolean;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
-Task.init(
+TaskModel.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -23,7 +23,7 @@ Task.init(
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     completed: {
       type: DataTypes.BOOLEAN,
@@ -37,4 +37,4 @@ Task.init(
   }
 );
 
-export default Task;
+export default TaskModel;

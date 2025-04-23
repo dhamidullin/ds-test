@@ -1,4 +1,4 @@
-import Task from '../models/Task'
+import TaskModel from '../models/TaskModel'
 import sequelize from '../config/database'
 
 async function initializeDatabase() {
@@ -7,7 +7,7 @@ async function initializeDatabase() {
     console.log('Database connection has been established successfully.')
 
     // Explicitly register the model
-    const models = [Task]
+    const models = [TaskModel]
     models.forEach(model => {
       sequelize.define(model.tableName, model.getAttributes())
     })
