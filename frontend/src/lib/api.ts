@@ -48,27 +48,22 @@ api.interceptors.response.use(
       requestData: error.config?.data,
     });
 
-    // Check if running in the browser before calling toast
-    if (typeof window !== 'undefined') {
-      // Show toast for common/unexpected client/server errors
+    const isBrowser = typeof window !== 'undefined'
+
+    if (isBrowser) {
       if (!statusCode || statusCode >= 500) {
         toast.error(errorMessage || 'A server error occurred. Please try again later.');
       } else if (!error.response && !error.request) {
-        // Handle errors during request setup
         toast.error(`Request setup error: ${errorMessage}`);
       } else if (!error.response) {
-        // Handle network errors (no response received)
         toast.error('Network error. Please check your connection.');
       }
-      // Potentially add toasts for specific 4xx errors here if desired globally
     }
 
-    // We still reject the promise here, letting the calling function handle the error structure
     return Promise.reject(error);
   }
 )
 
-// Updated tasksApi functions
 export const tasksApi = {
   getAll: async (): Promise<ApiResponse<Task[]>> => {
     try {
@@ -116,5 +111,4 @@ export const tasksApi = {
   },
 }
 
-// Exporting the instance might still be useful for SWR configuration or other direct uses
 export default api

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import RippleButton from '@/components/ui/RippleButton'
 
 // Export the type
@@ -18,18 +18,14 @@ interface TaskFormProps {
   mode: 'create' | 'edit'
 }
 
-interface TaskFormState {
-  title: string;
-  description: string;
-  completed: boolean;
+type TaskFormState = TaskFormData & {
   errors: {
     title?: string;
-    description?: string;
   };
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ initialData = {}, onSubmit, onCancel, isSubmitting, mode }) => {
-  const [formState, setFormState] = useState<TaskFormState>({
+const useTaskForm = (initialData: Partial<TaskFormData> = {}) => {
+  const [formState, setFormState] = React.useState<TaskFormState>({
     title: initialData?.title || '',
     description: initialData?.description || '',
     completed: initialData?.completed || false,
@@ -38,6 +34,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData = {}, onSubmit, onCance
 
   const validateForm = (): boolean => {
     const errors: TaskFormState['errors'] = {};
+
     if (!formState.title.trim()) {
       errors.title = 'Title is required';
     }
@@ -46,8 +43,19 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData = {}, onSubmit, onCance
     return Object.keys(errors).length === 0;
   };
 
+  return {
+    formState,
+    setFormState,
+    validateForm
+  };
+};
+
+const TaskForm: React.FC<TaskFormProps> = ({ initialData = {}, onSubmit, onCancel, isSubmitting, mode }) => {
+  const { formState, setFormState, validateForm } = useTaskForm(initialData);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
     const formData: TaskFormData = {
       title: formState.title,
       description: formState.description,
