@@ -1,20 +1,9 @@
 import axios from 'axios'
 import { Task, TaskCreationData, TaskUpdateData } from '@shared/types/task'
-
-const getBaseUrl = (): string => {
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:3001'
-  }
-
-  if (!process.env.NEXT_PUBLIC_API_URL) {
-    throw new Error('NEXT_PUBLIC_API_URL is not set')
-  }
-
-  return process.env.NEXT_PUBLIC_API_URL
-}
+import { getApiBaseUrl } from './config'
 
 const api = axios.create({
-  baseURL: getBaseUrl() + '/api',
+  baseURL: `${getApiBaseUrl()}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
