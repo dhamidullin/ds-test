@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import TrashCanButton from '@/app/tasks/components/TrashCanButton'
+import TrashCanButton from '@/app/tasks/_components/TrashCanButton'
 
 describe('ClickButton', () => {
   it('renders delete button with correct styles', () => {

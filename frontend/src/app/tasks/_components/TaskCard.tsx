@@ -1,6 +1,6 @@
 import { Task } from '@shared/types/task'
-import TrashCanButton from '@/app/tasks/components/TrashCanButton'
-import EditButton from '@/app/tasks/components/EditButton'
+import TrashCanButton from '@/app/tasks/_components/TrashCanButton'
+import EditButton from '@/app/tasks/_components/EditButton'
 import { memo } from 'react'
 
 interface TaskCardProps {

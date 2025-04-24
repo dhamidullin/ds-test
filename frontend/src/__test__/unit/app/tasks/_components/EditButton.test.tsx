@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import EditButton from '@/app/tasks/components/EditButton'
+import EditButton from '@/app/tasks/_components/EditButton'
 
 describe('LinkButton', () => {
   it('renders edit button with correct styles', () => {

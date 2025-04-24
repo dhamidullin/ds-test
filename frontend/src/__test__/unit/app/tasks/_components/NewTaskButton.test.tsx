@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import NewTaskButton from '@/app/tasks/components/NewTaskButton'
+import NewTaskButton from '@/app/tasks/_components/NewTaskButton'
 
 describe('NewTaskButton', () => {
   it('renders new task button with correct styles and text', () => {

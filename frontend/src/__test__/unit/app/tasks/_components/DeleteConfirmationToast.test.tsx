@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import DeleteConfirmationToast from '@/app/tasks/components/DeleteConfirmationToast'
+import DeleteConfirmationToast from '@/app/tasks/_components/DeleteConfirmationToast'
 
 describe('DeleteConfirmationToast', () => {
   it('shows confirmation toast with correct content', () => {
