@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { tasksApi } from '@/lib/api'
 import EditTaskPage from '@/app/tasks/[id]/edit/page'
 import { toast } from 'sonner'
+import { SWRConfig } from 'swr'
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -45,7 +46,11 @@ describe('EditTaskPage', () => {
   })
 
   it('renders the save changes form with initial values', async () => {
-    render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <EditTaskPage params={Promise.resolve({ id: '1' })} />
+      </SWRConfig>
+    )
 
     await waitFor(() => {
       expect(screen.getByLabelText('Title')).toHaveValue('Original Title')
@@ -57,7 +62,11 @@ describe('EditTaskPage', () => {
 
   it('updates task and shows success toast on successful submission', async () => {
     (tasksApi.update as jest.Mock).mockResolvedValue({ data: { ...mockTask, title: 'Updated Title' }, error: null })
-    render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <EditTaskPage params={Promise.resolve({ id: '1' })} />
+      </SWRConfig>
+    )
 
     await waitFor(() => {
       expect(screen.getByLabelText('Title')).toBeInTheDocument()
@@ -84,7 +93,11 @@ describe('EditTaskPage', () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
     (tasksApi.update as jest.Mock).mockResolvedValue({ data: null, error: apiError })
 
-    render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <EditTaskPage params={Promise.resolve({ id: '1' })} />
+      </SWRConfig>
+    )
 
     await waitFor(() => {
       expect(screen.getByLabelText('Title')).toBeInTheDocument()
@@ -104,15 +117,40 @@ describe('EditTaskPage', () => {
     const apiError = { message: 'API Fetch Error', status: 400 };
     (tasksApi.getById as jest.Mock).mockResolvedValue({ data: null, error: apiError });
 
-    render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <EditTaskPage params={Promise.resolve({ id: '1' })} />
+      </SWRConfig>
+    )
 
     await waitFor(() => {
       expect(toast.error).not.toHaveBeenCalledWith('Failed to load task: API Fetch Error');
     });
   });
 
+  it('redirects and shows toast on API fetch 404 failure', async () => {
+    const apiError = { message: 'Not Found', status: 404 };
+    (tasksApi.getById as jest.Mock).mockReset();
+    (tasksApi.getById as jest.Mock).mockResolvedValue({ data: null, error: apiError });
+
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <EditTaskPage params={Promise.resolve({ id: '1' })} />
+      </SWRConfig>
+    )
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('This task does not exist');
+      expect(mockRouter.push).toHaveBeenCalledWith('/tasks');
+    });
+  })
+
   it('navigates back to tasks list when back button is clicked', async () => {
-    render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <EditTaskPage params={Promise.resolve({ id: '1' })} />
+      </SWRConfig>
+    )
 
     await waitFor(() => {
       expect(screen.getByLabelText('Title')).toBeInTheDocument()
@@ -122,4 +160,4 @@ describe('EditTaskPage', () => {
 
     expect(mockRouter.push).toHaveBeenCalledWith('/tasks')
   })
-}) 
+})
