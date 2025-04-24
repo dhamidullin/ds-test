@@ -5,32 +5,16 @@ import { useRouter } from 'next/navigation'
 import { tasksApi } from '@/lib/api'
 import { toast } from 'sonner'
 import { pick } from 'lodash'
-import useSWR from 'swr'
 import TaskForm, { TaskFormData } from '@/components/forms/TaskForm'
 import BackArrowIcon from '@/components/ui/BackArrowIcon'
 import { Task } from '@shared/types/task'
+import { useTask } from './useTask'
 
 interface PageProps {
   params: Promise<{
     id: string
   }>
 }
-
-const fetcher = async (taskId: number) => {
-  const { data, error } = await tasksApi.getById(taskId);
-
-  if (error) {
-    const fetchError: any = new Error(error.message);
-    fetchError.status = error.status;
-    throw fetchError;
-  }
-
-  if (!data) {
-    throw new Error('Task data is unexpectedly null.');
-  }
-
-  return data;
-};
 
 const EditTaskPage: FC<PageProps> = ({ params }) => {
   const router = useRouter()
@@ -41,27 +25,7 @@ const EditTaskPage: FC<PageProps> = ({ params }) => {
     params.then(p => setTaskId(Number(p.id)))
   }, [params])
 
-  const { data: task, error: fetchError, isLoading, mutate } = useSWR(
-    taskId ? `${taskId}` : null,
-    () => fetcher(taskId!),
-    {
-      onError: (error) => {
-        console.error('Error fetching task:', error)
-
-        if (error?.status === 404) {
-          toast.error('This task does not exist')
-          router.push('/tasks')
-          return
-        }
-
-        toast.error(`Failed to load task: ${error.message}`)
-      },
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      revalidateIfStale: true,
-      refreshInterval: 0,
-    }
-  )
+  const { task, fetchError, isLoading, mutate } = useTask(taskId);
 
   const handleUpdateSubmit = async (formData: TaskFormData) => {
     if (!task || !taskId) return;
