@@ -7,10 +7,14 @@ WORKDIR /app
 # Install dependencies
 COPY package.json ./
 COPY yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --production --frozen-lockfile
 
 # Copy the application code
 COPY . .
+
+ARG CORS_ORIGIN
+ENV NODE_ENV=production
+ENV CORS_ORIGIN=${CORS_ORIGIN}
 
 # Expose the port the app runs on
 EXPOSE 3001

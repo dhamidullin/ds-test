@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import sequelize from './index';
+import sequelize from '../config/database';
 
 class TaskModel extends Model {
   public id!: number;

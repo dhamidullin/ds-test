@@ -4,10 +4,12 @@
   "version": "0.0.1",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "ts-node --transpile-only src/index.ts",
     "db:sync": "ts-node src/scripts/db-sync.ts",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@types/sequelize": "^4.28.20",
@@ -33,6 +35,8 @@
     "supertest": "^7.1.0",
     "ts-jest": "^29.3.2",
     "ts-node-dev": "^2.0.0",
+    "tsc": "^2.0.4",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   }
 }
