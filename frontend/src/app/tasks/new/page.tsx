@@ -3,24 +3,32 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { tasksApi } from '@/lib/api'
-import TaskForm from '@/components/forms/TaskForm'
+import TaskForm, { TaskFormData } from '@/components/forms/TaskForm'
+import BackArrowIcon from '@/components/ui/BackArrowIcon'
+import { toast } from 'sonner'
 
 export default function NewTaskPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  async function handleCreateSubmit(formData: { title: string; description: string }) {
+  async function handleCreateSubmit(formData: Pick<TaskFormData, 'title' | 'description'>) {
     setIsSubmitting(true)
 
-    try {
-      const newTask = await tasksApi.create({ title: formData.title, description: formData.description })
+    const { data: newTask, error } = await tasksApi.create({ title: formData.title, description: formData.description })
 
-      router.push(`/tasks/${newTask.id}/edit`)
-    } catch (error) {
+    setIsSubmitting(false)
+
+    if (error) {
       console.error('Error creating task:', error)
-      alert('Failed to create task')
-    } finally {
-      setIsSubmitting(false)
+      if (error.status !== 500) {
+        toast.error(`Failed to create task: ${error.message}`)
+      }
+    } else if (newTask) {
+      toast.success('Task created successfully!')
+      router.push(`/tasks/${newTask.id}/edit`)
+    } else {
+      console.error('API returned null data without an error after create.')
+      toast.error('Failed to create task due to an unexpected issue.')
     }
   }
 
@@ -34,21 +42,9 @@ export default function NewTaskPage() {
         <button
           onClick={handleCancel}
           className="text-gray-600 hover:text-gray-900 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full cursor-pointer"
+          aria-label="Cancel and go back to tasks"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-            />
-          </svg>
+          <BackArrowIcon />
         </button>
         <h1 className="text-2xl font-bold">New Task</h1>
       </div>

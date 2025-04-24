@@ -39,7 +39,7 @@ describe('NewTaskPage', () => {
 
   it('submits the form and navigates on success', async () => {
     const mockTask = { id: 1, title: 'Test Task', description: 'Test Description' };
-    (tasksApi.create as jest.Mock).mockResolvedValue(mockTask)
+    (tasksApi.create as jest.Mock).mockResolvedValue({ data: mockTask })
 
     render(<NewTaskPage />)
 
@@ -56,13 +56,15 @@ describe('NewTaskPage', () => {
         title: 'Test Task',
         description: 'Test Description',
       })
+
       expect(mockRouter.push).toHaveBeenCalledWith('/tasks/1/edit')
     })
   })
 
   it('shows error alert on API failure', async () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
-      ; (tasksApi.create as jest.Mock).mockRejectedValue(new Error('API Error'))
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+    const mockError = { message: 'API Error', status: 500 };
+    (tasksApi.create as jest.Mock).mockResolvedValue({ data: null, error: mockError })
 
     render(<NewTaskPage />)
 
@@ -75,10 +77,10 @@ describe('NewTaskPage', () => {
 
     // Wait for the error to be logged
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('Error creating task:', expect.any(Error))
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error creating task:', mockError)
     })
 
-    consoleSpy.mockRestore()
+    consoleErrorSpy.mockRestore()
   })
 
   it('navigates back to tasks list when cancel is clicked', () => {

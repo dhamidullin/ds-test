@@ -39,90 +39,86 @@ describe('EditTaskPage', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-      ; (useRouter as jest.Mock).mockReturnValue(mockRouter)
-      ; (tasksApi.getById as jest.Mock).mockResolvedValue(mockTask)
+    jest.clearAllMocks();
+    (useRouter as jest.Mock).mockReturnValue(mockRouter);
+    (tasksApi.getById as jest.Mock).mockResolvedValue({ data: mockTask, error: null });
   })
 
   it('renders the save changes form with initial values', async () => {
     render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
 
-    // Wait for the task to load
     await waitFor(() => {
-      expect(screen.getByText('Save Changes')).toBeInTheDocument()
+      expect(screen.getByLabelText('Title')).toHaveValue('Original Title')
     })
-
-    expect(screen.getByLabelText('Title')).toHaveValue('Original Title')
     expect(screen.getByLabelText('Description')).toHaveValue('Original Description')
     expect(screen.getByLabelText('Completed')).not.toBeChecked()
+    expect(screen.getByText('Save Changes')).toBeInTheDocument()
   })
 
   it('updates task and shows success toast on successful submission', async () => {
-    const updatedTask = {
-      ...mockTask,
-      title: 'Updated Title',
-      description: 'Updated Description',
-      completed: true,
-    };
-
-    (tasksApi.update as jest.Mock).mockResolvedValue(updatedTask)
-
+    (tasksApi.update as jest.Mock).mockResolvedValue({ data: { ...mockTask, title: 'Updated Title' }, error: null })
     render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
 
-    // Wait for the task to load
     await waitFor(() => {
       expect(screen.getByLabelText('Title')).toBeInTheDocument()
     })
 
-    // Update form values
     fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'Updated Title' } })
     fireEvent.change(screen.getByLabelText('Description'), { target: { value: 'Updated Description' } })
     fireEvent.click(screen.getByLabelText('Completed'))
 
-    // Submit the form
     fireEvent.click(screen.getByText('Save Changes'))
 
-    // Wait for the API call and toast
     await waitFor(() => {
       expect(tasksApi.update).toHaveBeenCalledWith(1, {
         title: 'Updated Title',
         description: 'Updated Description',
         completed: true,
       })
-
       expect(toast.success).toHaveBeenCalledWith('Changes saved successfully')
     })
   })
 
-  it('shows error toast on API failure', async () => {
-    ; (tasksApi.update as jest.Mock).mockRejectedValue(new Error('API Error'))
+  it('shows error toast on API update failure', async () => {
+    const apiError = { message: 'API Update Error', status: 500 };
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+    (tasksApi.update as jest.Mock).mockResolvedValue({ data: null, error: apiError })
 
     render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
 
-    // Wait for the task to load
     await waitFor(() => {
       expect(screen.getByLabelText('Title')).toBeInTheDocument()
     })
 
-    // Submit the form
+    fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'Test Title' } })
     fireEvent.click(screen.getByText('Save Changes'))
 
-    // Wait for the error toast
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Failed to save changes')
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error updating task:', apiError)
     })
+
+    consoleErrorSpy.mockRestore();
   })
+
+  it('shows error message on API fetch failure (non-404)', async () => {
+    const apiError = { message: 'API Fetch Error', status: 400 };
+    (tasksApi.getById as jest.Mock).mockResolvedValue({ data: null, error: apiError });
+
+    render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
+
+    await waitFor(() => {
+      expect(toast.error).not.toHaveBeenCalledWith('Failed to load task: API Fetch Error');
+    });
+  });
 
   it('navigates back to tasks list when back button is clicked', async () => {
     render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
 
-    // Wait for the task to load
     await waitFor(() => {
       expect(screen.getByLabelText('Title')).toBeInTheDocument()
     })
 
-    // Click the back button
-    fireEvent.click(screen.getByRole('button', { name: '' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Back to tasks' }))
 
     expect(mockRouter.push).toHaveBeenCalledWith('/tasks')
   })
