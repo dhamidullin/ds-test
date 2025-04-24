@@ -2,12 +2,12 @@
 
 import { useState, useEffect, FC } from 'react'
 import { useRouter } from 'next/navigation'
-import { useActionState } from 'react'
 import { tasksApi } from '@/lib/api'
 import { toast } from 'sonner'
 import { pick } from 'lodash'
 import useSWR from 'swr'
-import { RippleButton } from '@/components/ui/RippleButton'
+import TaskForm, { TaskFormData } from '@/components/forms/TaskForm'
+import BackArrowIcon from '@/components/ui/BackArrowIcon'
 
 interface PageProps {
   params: Promise<{
@@ -15,20 +15,16 @@ interface PageProps {
   }>
 }
 
-interface ActionState {
-  error: string | null
-  success: boolean
-}
-
 const EditTaskPage: FC<PageProps> = ({ params }) => {
   const router = useRouter()
   const [taskId, setTaskId] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorState, setErrorState] = useState<string | null>(null)
 
   useEffect(() => {
     params.then(p => setTaskId(p.id))
   }, [params])
 
-  // Use SWR for data fetching
   const { data: task, error: fetchError, isLoading, mutate } = useSWR(
     taskId ? `/tasks/${taskId}` : null,
     () => tasksApi.getById(Number(taskId)),
@@ -50,125 +46,77 @@ const EditTaskPage: FC<PageProps> = ({ params }) => {
     }
   )
 
-  const [state, submitAction, isPending] = useActionState(
-    async (currentState: ActionState, formData: FormData) => {
-      if (!task) return { ...currentState, error: 'Task not found' }
+  const handleUpdateSubmit = async (formData: TaskFormData) => {
+    if (!task || !taskId)
+      throw new Error('No task or taskId')
 
-      try {
-        const updatedTask = {
-          ...task,
-          title: formData.get('title') as string,
-          description: formData.get('description') as string,
-          completed: formData.get('completed') === 'on',
-        }
+    setIsSubmitting(true)
+    setErrorState(null)
 
-        // optimistic update
-        mutate(updatedTask, false)
-
-        // Make the actual API call
-        const update = pick(updatedTask, ['title', 'description', 'completed'])
-        await tasksApi.update(Number(taskId), update)
-
-        toast.success('Changes saved successfully')
-        return { error: null, success: true }
-      } catch (error) {
-        toast.error('Failed to save changes')
-        return { ...currentState, error: 'Failed to update task' }
+    try {
+      const updatedTaskData = {
+        ...task,
+        title: formData.title,
+        description: formData.description,
+        completed: formData.completed ?? false,
       }
-    },
-    { error: null, success: false }
-  )
+
+      mutate(updatedTaskData, false)
+
+      const updatePayload = pick(updatedTaskData, ['title', 'description', 'completed'])
+      await tasksApi.update(Number(taskId), updatePayload)
+
+      toast.success('Changes saved successfully')
+
+    } catch (error) {
+      console.error('Error updating task:', error)
+      toast.error('Failed to save changes')
+      setErrorState('Failed to update task')
+      mutate()
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleCancel = () => {
+    router.push('/tasks')
+  }
 
   if (!taskId || isLoading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>
   }
 
   if (fetchError || !task) {
-    return <div className="container mx-auto px-4 py-8">Task not found</div>
+    const message = fetchError?.response?.status === 404 ? 'Task not found' : 'Error loading task'
+    return <div className="container mx-auto px-4 py-8">{message}</div>
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center gap-2 mb-6">
         <button
-          onClick={() => router.push('/tasks')}
+          onClick={handleCancel}
           className="text-gray-600 hover:text-gray-900 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full cursor-pointer"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-            />
-          </svg>
+          <BackArrowIcon />
         </button>
 
-        {/* it's the only place yet where we can observe the optimistic UI update */}
         <h1 className="text-2xl font-bold">{task.title}</h1>
       </div>
 
-      {state.error && (
+      {errorState && (
         <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">
-          {state.error}
+          {errorState}
         </div>
       )}
 
-      <form action={submitAction} className="max-w-lg">
-        <div className="mb-4">
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-            Title
-          </label>
-
-          <input
-            type="text"
-            id="title"
-            name="title"
-            defaultValue={task.title}
-            className="w-full px-3 py-2 border rounded-md"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={task.description || ''}
-            className="w-full px-3 py-2 border rounded-md"
-            rows={4}
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="completed"
-              defaultChecked={task.completed}
-              className="mr-2"
-            />
-
-            <span className="text-sm font-medium text-gray-700">
-              Completed
-            </span>
-          </label>
-        </div>
-
-        <div className="flex gap-2">
-          <RippleButton isPending={isPending} type="submit" />
-        </div>
-      </form>
+      <TaskForm
+        mode="edit"
+        initialData={task}
+        onSubmit={handleUpdateSubmit}
+        onCancel={handleCancel}
+        isSubmitting={isSubmitting}
+      />
     </div>
   )
 }

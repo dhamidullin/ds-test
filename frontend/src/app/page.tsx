@@ -3,8 +3,7 @@ import Image from 'next/image'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Digital Suits Todo App',
-  description: 'A modern todo application built with Next.js, Express, and PostgreSQL.',
+  title: 'Task Manager',
 }
 
 export default function Home() {

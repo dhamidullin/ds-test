@@ -1,13 +1,10 @@
 import { FC } from 'react'
 
-interface DeleteButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  onClick: () => void
-}
+interface TrashCanButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> { }
 
-const DeleteButton: FC<DeleteButtonProps> = ({ onClick, ...rest }) => {
+const TrashCanButton: FC<TrashCanButtonProps> = ({ ...rest }) => {
   return (
     <button
-      onClick={onClick}
       className="p-2 text-gray-500 hover:text-red-500 rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
       {...rest}
     >
@@ -29,4 +26,4 @@ const DeleteButton: FC<DeleteButtonProps> = ({ onClick, ...rest }) => {
   )
 }
 
-export default DeleteButton
+export default TrashCanButton

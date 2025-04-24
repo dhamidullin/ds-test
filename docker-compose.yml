@@ -13,6 +13,8 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${DEPLOYMENT_TARGET}
     env_file:
       - .env
     depends_on:
@@ -22,6 +24,10 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        CORS_ORIGIN: ${DEPLOYMENT_TARGET}
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/digital_suits
     depends_on:

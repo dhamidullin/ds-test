@@ -10,7 +10,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:unit": "jest --testPathPattern=__test__/unit",
-    "test:integration": "jest --testPathPattern=__test__/integration"
+    "test:integration": "jest --testPathPattern=__test__/integration",
+    "test:coverage": "jest --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "axios": "^1.8.4",

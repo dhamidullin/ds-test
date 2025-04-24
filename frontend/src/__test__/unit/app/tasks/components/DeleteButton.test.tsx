@@ -1,11 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import ClickButton from '../../../../components/ui/ClickButton'
+import TrashCanButton from '@/app/tasks/components/TrashCanButton'
 
 describe('ClickButton', () => {
   it('renders delete button with correct styles', () => {
     const mockOnClick = jest.fn()
-    render(<ClickButton onClick={mockOnClick} />)
+    render(<TrashCanButton onClick={mockOnClick} />)
 
     const button = screen.getByRole('button')
     expect(button).toBeInTheDocument()
@@ -14,7 +14,7 @@ describe('ClickButton', () => {
 
   it('calls onClick handler when clicked', () => {
     const mockOnClick = jest.fn()
-    render(<ClickButton onClick={mockOnClick} />)
+    render(<TrashCanButton onClick={mockOnClick} />)
 
     const button = screen.getByRole('button')
     fireEvent.click(button)
@@ -24,7 +24,7 @@ describe('ClickButton', () => {
 
   it('contains svg icon', () => {
     const mockOnClick = jest.fn()
-    render(<ClickButton onClick={mockOnClick} />)
+    render(<TrashCanButton onClick={mockOnClick} />)
 
     const svg = document.querySelector('svg')
     expect(svg).toBeInTheDocument()
@@ -35,7 +35,7 @@ describe('ClickButton', () => {
   it('passes additional properties to button element', () => {
     const mockOnClick = jest.fn()
     render(
-      <ClickButton 
+      <TrashCanButton 
         onClick={mockOnClick} 
         type="submit"
         disabled

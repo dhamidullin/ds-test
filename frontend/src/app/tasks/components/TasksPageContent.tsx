@@ -3,17 +3,17 @@
 import { Task } from '@shared/types/task'
 import { tasksApi } from '@/lib/api'
 import { FC, useState } from 'react'
-import { TaskCard } from './TaskCard'
-import { EmptyState } from './EmptyState'
-import { NewTaskButton } from './NewTaskButton'
+import TaskCard from './TaskCard'
+import EmptyState from './EmptyState'
+import NewTaskButton from './NewTaskButton'
 import DeleteConfirmationToast from './DeleteConfirmationToast'
 import { toast } from 'sonner'
 
-interface TasksContentProps {
+interface TasksPageContentProps {
   initialTasks: Task[]
 }
 
-const TasksContent: FC<TasksContentProps> = ({ initialTasks }) => {
+const TasksPageContent: FC<TasksPageContentProps> = ({ initialTasks }) => {
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
 
   const handleDelete = async (taskId: number) => {
@@ -63,4 +63,4 @@ const TasksContent: FC<TasksContentProps> = ({ initialTasks }) => {
   )
 }
 
-export default TasksContent
+export default TasksPageContent

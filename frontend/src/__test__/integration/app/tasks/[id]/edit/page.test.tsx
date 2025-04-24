@@ -63,8 +63,9 @@ describe('EditTaskPage', () => {
       title: 'Updated Title',
       description: 'Updated Description',
       completed: true,
-    }
-      ; (tasksApi.update as jest.Mock).mockResolvedValue(updatedTask)
+    };
+
+    (tasksApi.update as jest.Mock).mockResolvedValue(updatedTask)
 
     render(<EditTaskPage params={Promise.resolve({ id: '1' })} />)
 

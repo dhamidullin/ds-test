@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import LinkButton from '../../../../components/ui/LinkButton'
+import EditButton from '@/app/tasks/components/EditButton'
 
 describe('LinkButton', () => {
   it('renders edit button with correct styles', () => {
-    render(<LinkButton href="/edit" />)
+    render(<EditButton href="/edit" />)
 
     const link = screen.getByRole('link')
     expect(link).toBeInTheDocument()
@@ -13,7 +13,7 @@ describe('LinkButton', () => {
   })
 
   it('contains svg icon', () => {
-    render(<LinkButton href="/edit" />)
+    render(<EditButton href="/edit" />)
 
     const svg = document.querySelector('svg')
     expect(svg).toBeInTheDocument()
@@ -23,7 +23,7 @@ describe('LinkButton', () => {
 
   it('passes additional properties to anchor element', () => {
     render(
-      <LinkButton 
+      <EditButton 
         href="/edit" 
         target="_blank"
         rel="noopener noreferrer"

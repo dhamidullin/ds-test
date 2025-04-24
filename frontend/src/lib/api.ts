@@ -1,21 +1,37 @@
 import axios from 'axios'
 import { Task, TaskCreationData, TaskUpdateData } from '@shared/types/task'
 
-const getBaseUrl = () => {
-  if (process.env.NODE_ENV === 'development')
-    return 'http://localhost:3001/api' // expected location of the backend dev server
+const getBaseUrl = (): string => {
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3001'
+  }
 
-  return typeof window === 'undefined' // is server
-    ? 'http://backend:3001/api' // backend docker compose service address
-    : '/api' // nginx will redirect all incoming /api requests to the backend docker compose service
+  if (!process.env.NEXT_PUBLIC_API_URL) {
+    throw new Error('NEXT_PUBLIC_API_URL is not set')
+  }
+
+  return process.env.NEXT_PUBLIC_API_URL
 }
 
 const api = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: getBaseUrl() + '/api',
   headers: {
     'Content-Type': 'application/json',
   },
 })
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.message,
+    })
+
+    return Promise.reject(error)
+  }
+)
 
 export const tasksApi = {
   getAll: async (): Promise<Task[]> => {

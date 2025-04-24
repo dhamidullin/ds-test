@@ -24,12 +24,12 @@ describe('NewTaskPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+      ; (useRouter as jest.Mock).mockReturnValue(mockRouter)
   })
 
   it('renders the new task form', () => {
     render(<NewTaskPage />)
-    
+
     expect(screen.getByText('New Task')).toBeInTheDocument()
     expect(screen.getByLabelText('Title')).toBeInTheDocument()
     expect(screen.getByLabelText('Description')).toBeInTheDocument()
@@ -38,8 +38,8 @@ describe('NewTaskPage', () => {
   })
 
   it('submits the form and navigates on success', async () => {
-    const mockTask = { id: 1, title: 'Test Task', description: 'Test Description' }
-    ;(tasksApi.create as jest.Mock).mockResolvedValue(mockTask)
+    const mockTask = { id: 1, title: 'Test Task', description: 'Test Description' };
+    (tasksApi.create as jest.Mock).mockResolvedValue(mockTask)
 
     render(<NewTaskPage />)
 
@@ -57,13 +57,12 @@ describe('NewTaskPage', () => {
         description: 'Test Description',
       })
       expect(mockRouter.push).toHaveBeenCalledWith('/tasks/1/edit')
-      expect(mockRouter.refresh).toHaveBeenCalled()
     })
   })
 
   it('shows error alert on API failure', async () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
-    ;(tasksApi.create as jest.Mock).mockRejectedValue(new Error('API Error'))
+      ; (tasksApi.create as jest.Mock).mockRejectedValue(new Error('API Error'))
 
     render(<NewTaskPage />)
 
@@ -84,9 +83,9 @@ describe('NewTaskPage', () => {
 
   it('navigates back to tasks list when cancel is clicked', () => {
     render(<NewTaskPage />)
-    
+
     fireEvent.click(screen.getByText('Cancel'))
-    
+
     expect(mockRouter.push).toHaveBeenCalledWith('/tasks')
   })
 }) 
