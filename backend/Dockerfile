@@ -1,23 +1,37 @@
-# Use an official Node runtime as a parent image
-FROM node:20-alpine
+# --- Builder Stage ---
+FROM node:20-alpine AS builder
 
-# Set working directory
+# copy package files and install dependencies
+WORKDIR /app/backend
+COPY backend/package.json backend/yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+# copy the rest of the application code needed for build
+COPY backend/tsconfig.json ./
+COPY backend/src ./src
+
+# copy shared code
+WORKDIR /app
+COPY ./shared ./shared
+WORKDIR /app/backend
+
+RUN yarn build
+
+# --- Runner Stage ---
+FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Install dependencies
-COPY package.json ./
-COPY yarn.lock ./
-RUN yarn install --production --frozen-lockfile
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Copy the application code
-COPY . .
+COPY --from=builder /app/backend/dist ./dist
+COPY backend/package.json ./
 
 ARG CORS_ORIGIN
 ENV NODE_ENV=production
 ENV CORS_ORIGIN=${CORS_ORIGIN}
 
-# Expose the port the app runs on
-EXPOSE 3001
+RUN chown -R appuser:appgroup /app
+USER appuser
 
-# Start the app with ts-node
-# CMD ["yarn", "start"] # handled by docker-compose
+EXPOSE 3001
+CMD ["node", "dist/index.js"]

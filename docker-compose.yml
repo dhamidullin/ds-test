@@ -23,10 +23,11 @@ services:
 
   backend: &backend-base
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
       args:
         CORS_ORIGIN: ${DEPLOYMENT_TARGET}
+    image: digital-suits/backend:latest
     env_file:
       - .env
     environment:
