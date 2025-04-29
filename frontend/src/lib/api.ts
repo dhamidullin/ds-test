@@ -45,6 +45,7 @@ api.interceptors.response.use(
       message: errorMessage,
       status: statusCode,
       url: error.config?.url,
+      baseURL: error.config?.baseURL,
       requestData: error.config?.data,
     });
 
