@@ -34,11 +34,11 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/digital_suits
     depends_on:
       - db
-    command: [ "yarn", "start" ]
+    command: [ "node", "dist/index.js" ]
 
   db-sync:
     <<: *backend-base
-    command: [ "yarn", "db:sync" ]
+    command: [ "node", "dist/db-sync.js" ]
 
   db:
     image: postgres:15-alpine

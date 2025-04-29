@@ -4,7 +4,9 @@
   "version": "0.0.1",
   "main": "src/index.ts",
   "scripts": {
-    "build": "ncc build src/index.ts -o dist",
+    "build": "yarn build:backend && yarn build:db-sync",
+    "build:backend": "ncc build src/index.ts -o dist",
+    "build:db-sync": "ncc build src/scripts/db-sync.ts -o dist-db-sync && mkdir -p dist && mv dist-db-sync/index.js dist/db-sync.js && rm -rf dist-db-sync",
     "start": "node dist/index.js",
     "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/index.ts",
     "db:sync": "ts-node src/scripts/db-sync.ts",
