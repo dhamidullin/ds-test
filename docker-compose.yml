@@ -8,6 +8,7 @@ services:
     depends_on:
       - frontend
       - backend
+    restart: unless-stopped
 
   frontend:
     build:
@@ -16,10 +17,12 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${DEPLOYMENT_TARGET}
         NEXT_PUBLIC_SITE_URL: ${DEPLOYMENT_TARGET}
+    image: digital-suits/frontend:latest
     env_file:
       - .env
     depends_on:
       - backend
+    restart: unless-stopped
 
   backend: &backend-base
     build:
@@ -35,10 +38,12 @@ services:
     depends_on:
       - db
     command: [ "node", "dist/index.js" ]
+    restart: unless-stopped
 
   db-sync:
     <<: *backend-base
     command: [ "node", "dist/db-sync.js" ]
+    restart: "no"
 
   db:
     image: postgres:15-alpine
@@ -50,6 +55,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    restart: unless-stopped
 
   pgadmin:
     image: dpage/pgadmin4
@@ -60,6 +66,7 @@ services:
       - "5050:80"
     depends_on:
       - db
+    restart: unless-stopped
 
 volumes:
   postgres_data:
