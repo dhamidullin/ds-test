@@ -6,9 +6,7 @@ import { types } from '../types';
 
 @injectable()
 export class TaskController {
-  constructor(
-    @inject(types.TaskService) private readonly taskService: TaskService
-  ) { }
+  constructor(@inject(types.TaskService) private readonly taskService: TaskService) { }
 
   async getAllTasks(_req: Request, res: Response): Promise<void> {
     try {
