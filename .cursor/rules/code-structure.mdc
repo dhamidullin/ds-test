@@ -1,0 +1,23 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Structure
+
+This project is a monorepo containing distinct applications orchestrated via Docker Compose ([`docker-compose.yml`](mdc:docker-compose.yml)).
+
+-   **`backend/`**: Contains the backend application.
+    -   Built with Node.js, Express.js, and TypeScript ([`backend/tsconfig.json`](mdc:backend/tsconfig.json)).
+    -   Uses Yarn for package management ([`backend/package.json`](mdc:backend/package.json), [`backend/yarn.lock`](mdc:backend/yarn.lock)).
+    -   The Docker build ([`backend/Dockerfile`](mdc:backend/Dockerfile)) uses the **project root** as its context to access the `shared/` directory. Note: This Dockerfile intentionally omits a `CMD` instruction because the command is specified in [`docker-compose.yml`](mdc:docker-compose.yml). This allows the same image to be used for both the main backend service (running the server) and the `db-sync` service (running database synchronizations).
+    -   Source code is primarily within [`backend/src/`](mdc:backend/src).
+-   **`frontend/`**: Contains the frontend application.
+    -   Built with Next.js, React, and TypeScript ([`frontend/next.config.ts`](mdc:frontend/next.config.ts), [`frontend/tsconfig.json`](mdc:frontend/tsconfig.json)).
+    -   Uses Yarn for package management ([`frontend/package.json`](mdc:frontend/package.json), [`frontend/yarn.lock`](mdc:frontend/yarn.lock)).
+    -   Includes Tailwind CSS for styling ([`frontend/tailwind.config.ts`](mdc:frontend/tailwind.config.ts)).
+    -   The Docker build ([`frontend/Dockerfile`](mdc:frontend/Dockerfile)) uses the **project root** as its context to access the `shared/` directory.
+    -   Source code is primarily within [`frontend/src/`](mdc:frontend/src).
+-   **`shared/`**: Contains code (like types/interfaces in `shared/types/`) shared between the `backend` and `frontend`. This code is accessible during Docker builds because the build context is the project root.
+-   **[`nginx.conf`](mdc:nginx.conf)**: Configuration for Nginx, used as a reverse proxy in the Docker setup. It routes requests starting with `/api` to the backend service and all other requests to the frontend service.
+-   **[`docker-compose.yml`](mdc:docker-compose.yml)**: Defines the services (backend, frontend, database, db-sync, pgadmin, nginx) and how they are built (specifying the root build context) and networked together using Docker. The `db-sync` service uses the backend image to run database synchronizations (e.g., `sequelize sync`). This is the primary orchestration file for the development environment.

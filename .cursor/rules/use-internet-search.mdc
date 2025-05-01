@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Verify Information with Internet Search
+
+The current query may pertain to information that is recent, rapidly changing, or otherwise potentially outside of my training data.
+
+If you suspect the information required to answer accurately is not within your internal knowledge:
+
+1.  **Use your internet search capability** to find the most current and relevant information related to the user's query.
+2.  Synthesize the information found through the search to provide an accurate answer.
+3.  If search results are ambiguous or insufficient, state that clearly rather than speculating.

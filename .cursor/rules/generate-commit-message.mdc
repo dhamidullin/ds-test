@@ -1,0 +1,28 @@
+---
+description: Guides the AI on how to generate a Git commit message by inspecting staged changes (`git diff --staged`) and analyzing recent commit history (`git log`) for style consistency.
+globs: 
+alwaysApply: false
+---
+# Generate Git Commit Message
+
+When asked to generate a Git commit message, follow these steps:
+
+1.  **Inspect Staged Changes:** Run the following command in the terminal to see the changes that are about to be committed:
+    ```bash
+    git diff --staged | cat
+    ```
+    Review the output to understand the purpose and scope of the changes.
+
+2.  **Analyze Recent Commit Style:** Run the following command to view the subject lines of the last 10 commits:
+    ```bash
+    git log -n 10 --pretty=format:%s | cat
+    ```
+    Observe the style of these messages (e.g., imperative mood like "Fix bug" vs. past tense "Fixed bug", use of prefixes like `feat:`, `fix:`, `chore:`, capitalization, punctuation).
+
+3.  **Generate the Commit Message:**
+    *   Based on the staged changes (Step 1) and the recent commit style (Step 2), craft a concise commit message.
+    *   The message should accurately summarize the changes.
+    *   Keep the message brief, typically 1 line for the subject, and optionally a few more lines (up to 5 total) for a body if more explanation is needed for complex changes.
+    *   Ensure the style (tense, capitalization, prefixes) matches the recent commit history.
+    *   Start the subject line with a capital letter unless the prevailing style dictates otherwise (e.g., lowercase prefixes like `fix:`).
+    *   Use the imperative mood for the subject line (e.g., "Add feature" not "Added feature" or "Adds feature") unless the recent style is clearly different.

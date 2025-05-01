@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+-   **Minimal Updates:** Stick strictly to the minimal code changes required by the prompt. Do not modify code outside the direct scope of the request.
+-   **No Cascading Changes:** Do *not* proactively update dependent code, imports, or function calls elsewhere in the codebase to match the requested change. I will explicitly ask for these broader updates if needed.
+-   **Dependency Awareness (TypeScript Focus):** If the requested minimal change *breaks* dependent code (e.g., causes TypeScript static type checking errors in other files), simply notify me about the breakage and *which files* are affected. **Do not attempt to fix these TypeScript errors** or other dependency issues unless I explicitly ask you to. I want to review the errors first.

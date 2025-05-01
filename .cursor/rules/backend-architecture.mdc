@@ -1,0 +1,120 @@
+---
+description: Explains the backend Controller-Service-Repository pattern using InversifyJS for dependency injection, including the roles of types.ts and container.ts, and provides templates for creating new controllers, services, and repositories.
+globs: 
+alwaysApply: false
+---
+# Backend Architecture: Controller-Service-Repository with Inversify
+
+The backend follows the Controller-Service-Repository pattern for organizing code and managing dependencies.
+
+## Dependency Injection with Inversify
+
+We use [InversifyJS](mdc:https:/inversify.io) for dependency injection (DI). This helps manage the relationships between classes and promotes loose coupling.
+
+-   **[`types.ts`](mdc:backend/src/types.ts):** This file defines symbols (`Symbol.for(...)`) used as unique identifiers for binding and injecting dependencies. Define new symbols here when adding new injectable classes.
+-   **[`container.ts`](mdc:backend/src/container.ts):** This file sets up the Inversify container. It binds the symbols defined in `types.ts` to their corresponding implementations (classes). Register new injectable classes (Repositories, Services, Controllers) here.
+
+## Pattern Breakdown
+
+1.  **Controller:** Handles incoming HTTP requests, validates input (using Zod schemas from `validators/`), calls the appropriate Service method, and sends back the HTTP response. Controllers inject Services.
+    *   Example: [`taskController.ts`](mdc:backend/src/controllers/taskController.ts)
+2.  **Service:** Contains the core business logic. It orchestrates operations, often calling one or more Repository methods. Services inject Repositories.
+    *   Example: [`taskService.ts`](mdc:backend/src/services/taskService.ts)
+3.  **Repository:** Responsible for data access logic. It interacts directly with the database models (e.g., Sequelize models in `models/`). Repositories are injected into Services.
+    *   Example: [`taskRepository.ts`](mdc:backend/src/repositories/taskRepository.ts)
+
+## Templates for New Features
+
+Use these templates as a starting point when adding new features. Remember to:
+
+1.  Define new symbols in [`types.ts`](mdc:backend/src/types.ts).
+2.  Bind the new classes in [`container.ts`](mdc:backend/src/container.ts).
+3.  Define input validation schemas in a new file under `validators/`.
+4.  Add new routes in `routes/index.ts` to connect the controller.
+
+### New Controller Template (`backend/src/controllers/newFeatureController.ts`)
+
+```typescript
+import { injectable, inject } from 'inversify';
+import { Request, Response } from 'express';
+// Import relevant validators
+// import { CreateNewFeatureInput, UpdateNewFeatureInput, createNewFeatureSchema, updateNewFeatureSchema, newFeatureIdSchema } from '../validators/newFeature';
+import type { NewFeatureService } from '../services/newFeatureService'; // Adjust path as needed
+import { types } from '../types';
+
+@injectable()
+export class NewFeatureController {
+  constructor(@inject(types.NewFeatureService) private readonly newFeatureService: NewFeatureService) { }
+
+  // Example method: Get all items
+  async getAllItems(_req: Request, res: Response): Promise<void> {
+    try {
+      const items = await this.newFeatureService.getAllItems();
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch items' });
+    }
+  }
+
+  // Add other methods (create, getById, update, delete) following the pattern in taskController.ts
+  // Remember to use input validation with Zod schemas
+}
+```
+
+### New Service Template (`backend/src/services/newFeatureService.ts`)
+
+```typescript
+import { injectable, inject } from 'inversify';
+// Import relevant types/DTOs if needed (e.g., from @shared)
+// import { NewFeature } from '@shared/types/newFeature';
+// Import input types from validators
+// import { CreateNewFeatureInput, UpdateNewFeatureInput } from '../validators/newFeature';
+import { types } from '../types';
+import type { NewFeatureRepository } from '../repositories/newFeatureRepository'; // Adjust path as needed
+
+@injectable()
+export class NewFeatureService {
+  constructor(
+    @inject(types.NewFeatureRepository) private readonly newFeatureRepository: NewFeatureRepository
+  ) { }
+
+  async getAllItems(): Promise<any[]> { // Replace 'any' with the actual return type (e.g., NewFeature[])
+    return this.newFeatureRepository.listAllItems();
+  }
+
+  // Add other methods (create, getById, update, delete) following the pattern in taskService.ts
+  // These methods will typically call corresponding methods in the repository
+}
+```
+
+### New Repository Template (`backend/src/repositories/newFeatureRepository.ts`)
+
+```typescript
+import { injectable } from 'inversify';
+// Import the relevant DB Model
+// import NewFeatureModel from "../models/NewFeatureModel";
+// Import input types from validators
+// import { CreateNewFeatureInput, UpdateNewFeatureInput } from '../validators/newFeature';
+// Import the DTO/type (e.g., from @shared)
+// import { NewFeature } from '@shared/types/newFeature';
+
+@injectable()
+export class NewFeatureRepository {
+
+  // Optional: Add a method to convert DB model instances to DTOs if needed
+  // private convertToDTO(model: NewFeatureModel): NewFeature {
+  //   return { /* mapping */ };
+  // }
+
+  async listAllItems(): Promise<any[]> { // Replace 'any' with the actual return type (e.g., NewFeature[])
+    // const items = await NewFeatureModel.findAll({ /* options */ });
+    // return items.map(this.convertToDTO); // Use converter if you have one
+    console.warn('listAllItems not implemented');
+    return []; // Placeholder
+  }
+
+  // Add other methods (create, findById, update, delete) following the pattern in taskRepository.ts
+  // These methods interact directly with the database model (e.g., NewFeatureModel)
+}
+
+```
