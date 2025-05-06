@@ -7,7 +7,7 @@ const LandingHeroCard = () => (
     <div className="max-w-2xl w-full bg-white/10 backdrop-blur-sm rounded-xl shadow-2xl p-8">
       <div className="text-center space-y-6">
         <h1 className="text-4xl font-bold text-white">
-          Digital Suits Todo Test Project
+          This is a test task for <span className="text-blue-400">Digital Suits</span>
         </h1>
 
         <p className="text-lg text-gray-200">
