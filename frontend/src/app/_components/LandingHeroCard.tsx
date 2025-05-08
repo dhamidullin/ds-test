@@ -16,10 +16,7 @@ const LandingHeroCard = () => (
         </p>
 
         <div className="pt-4 space-y-4">
-          <Link
-            href="/tasks"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
+          <Link href="/tasks" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             Go to Tasks
           </Link>
 

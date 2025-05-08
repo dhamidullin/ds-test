@@ -7,55 +7,61 @@ import { toast } from 'sonner'
 import { pick } from 'lodash'
 import TaskForm, { TaskFormData } from '@/components/forms/TaskForm'
 import BackArrowIcon from '@/components/ui/BackArrowIcon'
-import { Task } from '@shared/types/task'
-import { useTask } from './useTask'
+import { Task, TaskUpdateData } from '@shared/types/task'
+import { useTask } from '@/lib/queries'
+import { useUpdateTask, UpdateTaskArgs } from '@/lib/mutations'
 
 interface PageProps {
-  params: Promise<{
-    id: string
-  }>
+  params: Promise<{ id: string }>
 }
 
-const EditTaskPage: FC<PageProps> = ({ params }) => {
+const EditTaskPageContent: FC<{ taskId: number }> = ({ taskId }) => {
   const router = useRouter()
-  const [taskId, setTaskId] = useState<number | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { data: task, error: fetchError, isLoading, mutate: localTaskMutate } = useTask(taskId)
+  const { trigger: updateTaskTrigger, isMutating: isUpdatingTask } = useUpdateTask(taskId)
 
   useEffect(() => {
-    params.then(p => setTaskId(Number(p.id)))
-  }, [params])
-
-  const { task, fetchError, isLoading, mutate } = useTask(taskId);
+    if (fetchError) {
+      console.error('Error fetching task:', fetchError)
+      const status = (fetchError as any).status
+      if (status === 404) {
+        toast.error('This task does not exist')
+        router.push('/tasks')
+      } else {
+        toast.error(`Failed to load task: ${fetchError.message || 'An unknown error occurred'}`)
+      }
+    }
+  }, [fetchError, router])
 
   const handleUpdateSubmit = async (formData: TaskFormData) => {
-    if (!task || !taskId) return;
+    if (!task) return
 
-    setIsSubmitting(true)
-
-    const updatePayload = pick(formData, ['title', 'description', 'completed'])
+    const updatePayload: TaskUpdateData = pick(formData, ['title', 'description', 'completed'])
 
     const optimisticData: Task = {
       ...task,
       ...updatePayload,
       completed: formData.completed ?? task.completed ?? false,
-    };
+    }
 
-    mutate(optimisticData, false)
+    localTaskMutate(optimisticData, { revalidate: false })
 
-    const { data: _updatedTask, error: updateError } = await tasksApi.update(taskId, updatePayload)
+    try {
+      const args: UpdateTaskArgs = { id: taskId, payload: updatePayload };
+      await updateTaskTrigger(args)
 
-    setIsSubmitting(false)
-
-    if (updateError) {
-      console.error('Error updating task:', updateError)
-
-      if (updateError.status && updateError.status < 500) {
-        toast.error(`Failed to save changes: ${updateError.message}`)
-      }
-
-      mutate(task, false)
-    } else {
       toast.success('Changes saved successfully')
+    } catch (error: any) {
+      console.error('Error updating task:', error)
+
+      localTaskMutate(task, { revalidate: false })
+
+      if (error.status && error.status < 500) {
+        toast.error(`Failed to save changes: ${error.message}`)
+      } else {
+        toast.error(`Failed to save changes: ${error.message || 'An unknown server error occurred'}`)
+      }
     }
   }
 
@@ -63,16 +69,16 @@ const EditTaskPage: FC<PageProps> = ({ params }) => {
     router.push('/tasks')
   }
 
-  if (!taskId || isLoading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>
+  if (isLoading) {
+    return <div className="container mx-auto px-4 py-8">Loading task details...</div>
   }
 
-  if (fetchError && fetchError.status !== 404) {
+  if (fetchError) {
     return <div className="container mx-auto px-4 py-8">Error loading task: {fetchError.message}</div>
   }
 
   if (!task) {
-    return <div className="container mx-auto px-4 py-8">Task not found.</div>
+    return <div className="container mx-auto px-4 py-8">Task not found or data is unavailable.</div>
   }
 
   return (
@@ -94,10 +100,39 @@ const EditTaskPage: FC<PageProps> = ({ params }) => {
         initialData={task}
         onSubmit={handleUpdateSubmit}
         onCancel={handleCancel}
-        isSubmitting={isSubmitting}
+        isSubmitting={isUpdatingTask}
       />
     </div>
   )
+}
+
+const EditTaskPage: FC<PageProps> = ({ params }) => {
+  const router = useRouter()
+  const [taskId, setTaskId] = useState<number | null>(null)
+
+  useEffect(() => {
+    params.then(p => {
+      const idNumber = Number(p.id)
+
+      if (isNaN(idNumber)) {
+        console.error('Invalid task ID in URL parameter:', p.id)
+        toast.error('Invalid task ID provided.')
+        router.push('/tasks')
+      } else {
+        setTaskId(idNumber)
+      }
+    }).catch(error => {
+      console.error('Error processing URL parameters:', error)
+      toast.error('Could not load task details due to a parameter processing error.')
+      router.push('/tasks')
+    })
+  }, [params, router])
+
+  if (taskId === null) {
+    return <div className="container mx-auto px-4 py-8">Loading...</div>
+  }
+
+  return <EditTaskPageContent taskId={taskId} />
 }
 
 export default EditTaskPage

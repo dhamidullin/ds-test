@@ -1,34 +1,37 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { tasksApi } from '@/lib/api'
 import TaskForm, { TaskFormData } from '@/components/forms/TaskForm'
 import BackArrowIcon from '@/components/ui/BackArrowIcon'
 import { toast } from 'sonner'
+import { useCreateTask } from '@/lib/mutations'
+import { TaskCreationData } from '@shared/types/task'
 
 export default function NewTaskPage() {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { trigger: createTaskTrigger, isMutating: isCreatingTask } = useCreateTask()
 
   async function handleCreateSubmit(formData: Pick<TaskFormData, 'title' | 'description'>) {
-    setIsSubmitting(true)
+    const creationData: TaskCreationData = {
+      title: formData.title,
+      description: formData.description
+    }
 
-    const { data: newTask, error } = await tasksApi.create({ title: formData.title, description: formData.description })
-
-    setIsSubmitting(false)
-
-    if (error) {
-      console.error('Error creating task:', error)
-      if (error.status !== 500) {
-        toast.error(`Failed to create task: ${error.message}`)
-      }
-    } else if (newTask) {
+    try {
+      const newTask = await createTaskTrigger(creationData)
+      
       toast.success('Task created successfully!')
       router.push(`/tasks/${newTask.id}/edit`)
-    } else {
-      console.error('API returned null data without an error after create.')
-      toast.error('Failed to create task due to an unexpected issue.')
+
+    } catch (error: any) {
+      console.error('Error creating task:', error)
+      if (error.status && error.status !== 500) {
+        toast.error(`Failed to create task: ${error.message}`)
+      } else if (error.status === 500) {
+        toast.error('Failed to create task: Server error.')
+      } else {
+        toast.error(`Failed to create task: ${error.message || 'An unexpected error occurred.'}`)
+      }
     }
   }
 
@@ -46,6 +49,7 @@ export default function NewTaskPage() {
         >
           <BackArrowIcon />
         </button>
+
         <h1 className="text-2xl font-bold">New Task</h1>
       </div>
 
@@ -53,7 +57,7 @@ export default function NewTaskPage() {
         mode="create"
         onSubmit={handleCreateSubmit}
         onCancel={handleCancel}
-        isSubmitting={isSubmitting}
+        isSubmitting={isCreatingTask}
       />
     </div>
   )

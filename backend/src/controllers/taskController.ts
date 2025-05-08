@@ -34,6 +34,7 @@ export class TaskController {
   async getTaskById(req: Request<{ id: number }>, res: Response): Promise<void> {
     try {
       const { id } = taskIdSchema.parse({ id: req.params.id });
+
       const task = await this.taskService.getTaskById(id);
       if (!task) {
         res.status(404).json({ error: 'Task not found' });

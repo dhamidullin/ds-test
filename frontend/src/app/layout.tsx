@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import { FC } from "react";
 import { Toaster } from "sonner";
 import { getSiteUrl } from "@/lib/config";
+import SWRProvider from "./SWRProvider";
+import "./globals.css";
 
 const siteUrl = getSiteUrl();
 
@@ -36,12 +37,18 @@ export const metadata: Metadata = {
   },
 };
 
-const RootLayout: FC<Readonly<{ children: React.ReactNode }>> = ({ children }) => {
+interface RootLayoutProps {
+  children: React.ReactNode
+}
+
+const RootLayout: FC<RootLayoutProps> = ({ children }) => {
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        {children}
-        <Toaster richColors position="top-right" />
+        <SWRProvider>
+          {children}
+          <Toaster richColors position="top-right" />
+        </SWRProvider>
       </body>
     </html>
   );

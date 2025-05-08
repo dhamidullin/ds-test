@@ -15,7 +15,7 @@ interface ApiResponse<T> {
   error: ApiError | null;
 }
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: `${getApiBaseUrl()}/api`,
   headers: {
     'Content-Type': 'application/json',
@@ -65,6 +65,7 @@ api.interceptors.response.use(
   }
 )
 
+// TODO: get rid of this
 export const tasksApi = {
   getAll: async (): Promise<ApiResponse<Task[]>> => {
     try {
