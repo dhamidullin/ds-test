@@ -1,138 +1,59 @@
-'use client'
+import { tasksApi } from "@/lib/api";
+import React, { Suspense } from "react";
+import EditTask from "./EditTask";
+import { redirect } from 'next/navigation'
 
-import { useState, useEffect, FC } from 'react'
-import { useRouter } from 'next/navigation'
-import { tasksApi } from '@/lib/api'
-import { toast } from 'sonner'
-import { pick } from 'lodash'
-import TaskForm, { TaskFormData } from '@/components/forms/TaskForm'
-import BackArrowIcon from '@/components/ui/BackArrowIcon'
-import { Task, TaskUpdateData } from '@shared/types/task'
-import { useTask } from '@/lib/queries'
-import { useUpdateTask, UpdateTaskArgs } from '@/lib/mutations'
+const EditTaskPage: React.FC<{ params: Promise<{ id: string }> }> = async ({ params: paramsPromise }) => {
+  const params = await paramsPromise;
 
-interface PageProps {
-  params: Promise<{ id: string }>
-}
-
-const EditTaskPageContent: FC<{ taskId: number }> = ({ taskId }) => {
-  const router = useRouter()
-
-  const { data: task, error: fetchError, isLoading, mutate: localTaskMutate } = useTask(taskId)
-  const { trigger: updateTaskTrigger, isMutating: isUpdatingTask } = useUpdateTask(taskId)
-
-  useEffect(() => {
-    if (fetchError) {
-      console.error('Error fetching task:', fetchError)
-      const status = (fetchError as any).status
-      if (status === 404) {
-        toast.error('This task does not exist')
-        router.push('/tasks')
-      } else {
-        toast.error(`Failed to load task: ${fetchError.message || 'An unknown error occurred'}`)
-      }
-    }
-  }, [fetchError, router])
-
-  const handleUpdateSubmit = async (formData: TaskFormData) => {
-    if (!task) return
-
-    const updatePayload: TaskUpdateData = pick(formData, ['title', 'description', 'completed'])
-
-    const optimisticData: Task = {
-      ...task,
-      ...updatePayload,
-      completed: formData.completed ?? task.completed ?? false,
-    }
-
-    localTaskMutate(optimisticData, { revalidate: false })
-
-    try {
-      const args: UpdateTaskArgs = { id: taskId, payload: updatePayload };
-      await updateTaskTrigger(args)
-
-      toast.success('Changes saved successfully')
-    } catch (error: any) {
-      console.error('Error updating task:', error)
-
-      localTaskMutate(task, { revalidate: false })
-
-      if (error.status && error.status < 500) {
-        toast.error(`Failed to save changes: ${error.message}`)
-      } else {
-        toast.error(`Failed to save changes: ${error.message || 'An unknown server error occurred'}`)
-      }
-    }
-  }
-
-  const handleCancel = () => {
-    router.push('/tasks')
-  }
-
-  if (isLoading) {
-    return <div className="container mx-auto px-4 py-8">Loading task details...</div>
-  }
-
-  if (fetchError) {
-    return <div className="container mx-auto px-4 py-8">Error loading task: {fetchError.message}</div>
-  }
-
-  if (!task) {
-    return <div className="container mx-auto px-4 py-8">Task not found or data is unavailable.</div>
-  }
+  const fallbackUI = (
+    <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-600 font-medium">Loading task...</p>
+      </div>
+    </div>
+  )
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center gap-2 mb-6">
-        <button
-          onClick={handleCancel}
-          className="text-gray-600 hover:text-gray-900 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full cursor-pointer"
-          aria-label="Back to tasks"
-        >
-          <BackArrowIcon />
-        </button>
-
-        <h1 className="text-2xl font-bold">{task.title}</h1>
-      </div>
-
-      <TaskForm
-        mode="edit"
-        initialData={task}
-        onSubmit={handleUpdateSubmit}
-        onCancel={handleCancel}
-        isSubmitting={isUpdatingTask}
-      />
-    </div>
+    <Suspense fallback={fallbackUI}>
+      <TaskContent id={params.id} />
+    </Suspense>
   )
 }
 
-const EditTaskPage: FC<PageProps> = ({ params }) => {
-  const router = useRouter()
-  const [taskId, setTaskId] = useState<number | null>(null)
+const TaskContent: React.FC<{ id: string }> = async ({ id }) => {
+  const { data: task, error } = await tasksApi.getById(Number(id));
 
-  useEffect(() => {
-    params.then(p => {
-      const idNumber = Number(p.id)
-
-      if (isNaN(idNumber)) {
-        console.error('Invalid task ID in URL parameter:', p.id)
-        toast.error('Invalid task ID provided.')
-        router.push('/tasks')
-      } else {
-        setTaskId(idNumber)
-      }
-    }).catch(error => {
-      console.error('Error processing URL parameters:', error)
-      toast.error('Could not load task details due to a parameter processing error.')
-      router.push('/tasks')
-    })
-  }, [params, router])
-
-  if (taskId === null) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>
+  if (process.env.NODE_ENV === 'development') {
+    await new Promise(resolve => setTimeout(resolve, 300)); // for suspense to be visible on dev
   }
 
-  return <EditTaskPageContent taskId={taskId} />
+  if (error?.status === 404) {
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Task Not Found</h2>
+        <p className="text-gray-600 mb-6">The task you're looking for doesn't exist or has been removed.</p>
+        <a href="/tasks" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+          Return to Tasks
+        </a>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-600 font-medium p-4 bg-red-50 border border-red-200 rounded-md">
+        Error: {error.message}
+      </div>
+    )
+  }
+
+  if (!task) {
+    return redirect('/tasks')
+  }
+
+  return <EditTask taskId={task.id} initialData={task} />
 }
 
 export default EditTaskPage

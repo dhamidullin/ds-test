@@ -15,13 +15,14 @@ const swrConfig: SWRConfiguration = {
   // revalidateIfStale: false,
   // revalidateOnFocus: false,
   // revalidateOnReconnect: false,
+
   provider: (cache) => {
     // Skip localStorage on server side
     if (typeof window === 'undefined') {
       return cache;
     }
 
-    const localStorageKey = 'swr-cache-6iOjpIV3A1';
+    const localStorageKey = 'swr-cache-6iOjpIV3A2';
     const map = new Map<string, any>(JSON.parse(localStorage.getItem(localStorageKey) || '[]'));
 
     // Save cache on page unload
@@ -34,12 +35,10 @@ const swrConfig: SWRConfiguration = {
   }
 }
 
-const SWRProvider: React.FC<SWRProviderProps> = ({ children }) => {
-  return (
-    <SWRConfig value={swrConfig}>
-      {children}
-    </SWRConfig>
-  )
-}
+const SWRProvider: React.FC<SWRProviderProps> = ({ children }) => (
+  <SWRConfig value={swrConfig}>
+    {children}
+  </SWRConfig>
+)
 
 export default SWRProvider;
