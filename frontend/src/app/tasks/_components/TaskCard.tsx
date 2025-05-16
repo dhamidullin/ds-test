@@ -28,7 +28,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onDelete = () => { } }) => {
           </span>
 
           <div className="flex items-center gap-2">
-            <EditButton href={`/tasks/${task.id}/edit`} />
+            <EditButton href={`/tasks/${task.id}`} />
             <TrashCanButton onClick={() => onDelete(task.id)} />
           </div>
         </div>

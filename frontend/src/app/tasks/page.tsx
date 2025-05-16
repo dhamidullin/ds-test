@@ -1,29 +1,3 @@
-// import { tasksApi } from '@/lib/api';
-// import TasksPageContent from './_components/TasksPageContent'
-
-// const TasksPage: React.FC<{ searchParams: Promise<{ q: string }> }> = async ({ searchParams }) => {
-//   const { q } = await searchParams;
-
-//   const { data: tasks, error } = await tasksApi.getAll()
-
-//   // TODO: review this ifs
-//   if (error) {
-//     return <div>Error: {error.message}</div>
-//   }
-
-//   if (!tasks) {
-//     return <div>No tasks found</div>
-//   }
-
-//   return (
-//     <TasksPageContent initialTasks={tasks} />
-//   )
-// }
-
-// export default TasksPage;
-
-export const dynamic = 'force-dynamic'
-
 import { tasksApi } from '@/lib/api'
 import { Metadata } from 'next'
 import TasksPageContent from './_components/TasksPageContent'
@@ -33,8 +7,7 @@ export const metadata: Metadata = {
 }
 
 async function getTasks() {
-  const response = await tasksApi.getAll()
-  return response
+  return await tasksApi.getAll()
 }
 
 export default async function TasksPage() {

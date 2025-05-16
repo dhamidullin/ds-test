@@ -55,9 +55,7 @@ const TasksPageContent: FC<TasksPageContentProps> = ({ initialTasks }) => {
       </div>
 
       <div className="grid gap-6">
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} onDelete={handleDelete} />
-        ))}
+        {tasks.map(task => <TaskCard key={task.id} task={task} onDelete={handleDelete} />)}
       </div>
     </div>
   )

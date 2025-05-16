@@ -1,17 +1,14 @@
 import { tasksApi } from "@/lib/api";
 import React, { Suspense } from "react";
-import EditTask from "./EditTask";
+import TaskEditPage from "./TaskEditPage";
 import { redirect } from 'next/navigation'
 
 const EditTaskPage: React.FC<{ params: Promise<{ id: string }> }> = async ({ params: paramsPromise }) => {
   const params = await paramsPromise;
 
   const fallbackUI = (
-    <div className="flex items-center justify-center min-h-[200px]">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-gray-600 font-medium">Loading task...</p>
-      </div>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
     </div>
   )
 
@@ -22,14 +19,14 @@ const EditTaskPage: React.FC<{ params: Promise<{ id: string }> }> = async ({ par
   )
 }
 
-const TaskContent: React.FC<{ id: string }> = async ({ id }) => {
-  const { data: task, error } = await tasksApi.getById(Number(id));
+const TaskContent: React.FC<{ id: string }> = async ({ id }: { id: string }) => {
+  const taskData = await tasksApi.getById(Number(id));
 
   if (process.env.NODE_ENV === 'development') {
     await new Promise(resolve => setTimeout(resolve, 300)); // for suspense to be visible on dev
   }
 
-  if (error?.status === 404) {
+  if (taskData.error?.status === 404) {
     return (
       <div className="text-center p-8">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Task Not Found</h2>
@@ -41,19 +38,19 @@ const TaskContent: React.FC<{ id: string }> = async ({ id }) => {
     )
   }
 
-  if (error) {
+  if (taskData.error) {
     return (
       <div className="text-red-600 font-medium p-4 bg-red-50 border border-red-200 rounded-md">
-        Error: {error.message}
+        Error: {taskData.error.message}
       </div>
     )
   }
 
-  if (!task) {
+  if (!taskData.data) {
     return redirect('/tasks')
   }
 
-  return <EditTask taskId={task.id} initialData={task} />
+  return <TaskEditPage taskId={taskData.data.id} initialData={taskData.data} />
 }
 
 export default EditTaskPage

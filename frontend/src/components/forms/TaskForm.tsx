@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import RippleButton from '@/components/ui/RippleButton'
 
 // Export the type
@@ -24,8 +24,8 @@ type TaskFormState = TaskFormData & {
   };
 }
 
-const useTaskForm = (initialData: Partial<TaskFormData> = {}) => {
-  const [formState, setFormState] = React.useState<TaskFormState>({
+const useTaskForm = (initialData: TaskFormProps['initialData'], onSubmit: TaskFormProps['onSubmit']) => {
+  const [formState, setFormState] = useState<TaskFormState>({
     title: initialData?.title || '',
     description: initialData?.description || '',
     completed: initialData?.completed || false,
@@ -43,15 +43,15 @@ const useTaskForm = (initialData: Partial<TaskFormData> = {}) => {
     return Object.keys(errors).length === 0;
   };
 
-  return {
-    formState,
-    setFormState,
-    validateForm
-  };
-};
-
-const TaskForm: React.FC<TaskFormProps> = ({ initialData = {}, onSubmit, onCancel, isSubmitting, mode }) => {
-  const { formState, setFormState, validateForm } = useTaskForm(initialData);
+  // update the data if updated initial data is provided
+  useEffect(() => {
+    setFormState(prev => ({
+      ...prev,
+      title: initialData?.title || prev.title,
+      description: initialData?.description || prev.description,
+      completed: initialData?.completed ?? prev.completed
+    }))
+  }, [initialData])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -67,8 +67,19 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData = {}, onSubmit, onCance
     }
   }
 
+  return {
+    formState,
+    setFormState,
+    handleSubmit
+  };
+};
+
+const TaskForm = ({ initialData = {}, onSubmit, onCancel, isSubmitting, mode }: TaskFormProps) => {
+  const { formState, setFormState, handleSubmit } = useTaskForm(initialData, onSubmit);
+
   // derived state
   const isCreate = mode === 'create'
+  const isEdit = mode === 'edit'
   const submitButtonText = isCreate ? 'Create Task' : 'Save Changes'
   const submittingButtonText = isCreate ? 'Creating...' : 'Saving...'
 
@@ -105,7 +116,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData = {}, onSubmit, onCance
         />
       </div>
 
-      {mode === 'edit' && (
+      {isEdit && (
         <div className="mb-4">
           <label className="flex items-center">
             <input
