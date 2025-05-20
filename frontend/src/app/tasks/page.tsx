@@ -1,6 +1,7 @@
 import { tasksApi } from '@/lib/api'
 import { Metadata } from 'next'
 import TasksPageContent from './_components/TasksPageContent'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   title: 'Tasks',
@@ -10,7 +11,7 @@ async function getTasks() {
   return await tasksApi.getAll()
 }
 
-export default async function TasksPage() {
+async function TasksPage() {
   const { data: tasks, error } = await getTasks()
 
   if (error) {
@@ -37,3 +38,18 @@ export default async function TasksPage() {
 
   return <TasksPageContent initialTasks={tasks} />
 }
+
+export default function Page() {
+  const fallbackUI = (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+  )
+
+  return (
+    <Suspense fallback={fallbackUI}>
+      <TasksPage />
+    </Suspense>
+  )
+}
+
